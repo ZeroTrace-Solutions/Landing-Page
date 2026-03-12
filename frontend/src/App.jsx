@@ -4,7 +4,18 @@ import { VideoIntro } from '@/components/ui/video-intro'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { Logo } from '@/components/ui/branding'
 import { Button } from '@/components/ui/button'
-import { Rocket, Cpu, Globe, MessageSquare, ArrowRight, Zap, Shield, Code } from 'lucide-react'
+import { Rocket, Cpu, Globe, MessageSquare, ArrowRight, Zap, Shield, Code, Layers } from 'lucide-react'
+import SplashCursor from '@/components/SplashCursor'
+import Magnet from '@/components/Magnet'
+import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
+import StarBorder from '@/components/StarBorder'
+import GradualBlur from '@/components/GradualBlur'
+import MetaBalls from '@/components/MetaBalls'
+import FluidGlass from '@/components/FluidGlass'
+import DecryptedText from '@/components/DecryptedText'
+import TextPressure from '@/components/TextPressure'
+import TextType from '@/components/TextType'
+
 
 function App() {
   const [showContent, setShowContent] = useState(false)
@@ -12,6 +23,14 @@ function App() {
   return (
     <div className="relative min-h-screen bg-transparent text-white selection:bg-white/20">
       <UniverseBackground />
+      <SplashCursor
+        SPLAT_RADIUS={0.08}
+        SPLAT_FORCE={2500}
+        DENSITY_DISSIPATION={8}
+        VELOCITY_DISSIPATION={3.5}
+        COLOR_UPDATE_SPEED={4}
+      />
+
       <VideoIntro onComplete={() => setShowContent(true)} />
 
       {showContent && (
@@ -27,7 +46,12 @@ function App() {
 
             <div className="flex items-center gap-4">
               <div className="w-10 h-px bg-white/20" />
-              <span className="text-xs font-bold tracking-[0.4em] uppercase text-white/40">Alexandria 2026</span>
+              <DecryptedText
+                text="Alexandria 2026"
+                animateOn="view"
+                revealDirection="start"
+                className="text-xs font-bold tracking-[0.4em] uppercase text-white/40"
+              />
             </div>
             <nav className="hidden lg:flex gap-12 text-[10px] font-bold text-white/30 uppercase tracking-[0.5em]">
               <a href="#" className="hover:text-white transition-colors">Framework</a>
@@ -54,19 +78,26 @@ function App() {
               {/* Tagline and Buttons follow immediately in the flow */}
               <div className="w-full flex flex-col items-center -mt-32 pb-32">
                 <ScrollReveal delay={600}>
-                  <p className="max-w-xl mx-auto text-center text-lg md:text-xl text-white/40 font-light leading-relaxed mb-16 tracking-wide backdrop-blur-sm">
-                    Architecting high-performance digital infrastructure with mathematical precision. We don't just write code; we build the future.
-                  </p>
+                  <div className="max-w-xl mx-auto text-center mb-16 px-4">
+                    <GradualBlur
+                      text="Architecting high-performance digital infrastructure with mathematical precision. We don't just write code; we build the future."
+                      className="text-lg md:text-xl text-white/40 font-light leading-relaxed tracking-wide backdrop-blur-sm"
+                    />
+                  </div>
                 </ScrollReveal>
 
                 <ScrollReveal delay={900}>
                   <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
-                    <Button size="xl" className="rounded-none px-16 bg-white text-black hover:bg-white/90 transition-all font-black uppercase tracking-[0.2em] text-xs shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-                      Initialize Project
-                    </Button>
-                    <Button size="xl" variant="ghost" className="text-white/40 hover:text-white transition-all uppercase tracking-[0.3em] text-[10px] font-bold">
-                      Read Whitepaper <ArrowRight className="ml-4 w-4 h-4" />
-                    </Button>
+                    <Magnet padding={20} disabled={false} magnetStrength={2}>
+                      <Button size="xl" className="rounded-none px-16 bg-white text-black hover:bg-white/90 transition-all font-black uppercase tracking-[0.2em] text-xs shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                        Initialize Project
+                      </Button>
+                    </Magnet>
+                    <Magnet padding={20}>
+                      <Button size="xl" variant="ghost" className="text-white/40 hover:text-white transition-all uppercase tracking-[0.3em] text-[10px] font-bold">
+                        Read Whitepaper <ArrowRight className="ml-4 w-4 h-4" />
+                      </Button>
+                    </Magnet>
                   </div>
                 </ScrollReveal>
               </div>
@@ -79,65 +110,135 @@ function App() {
             </section>
 
 
-            {/* Core Pillars */}
-            <section className="py-48 px-6 max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-1px bg-white/5 border border-white/5 overflow-hidden">
-                {[
-                  { icon: <Code />, title: "Precision Engineering", desc: "Every micro-interaction is optimized for peak performance and absolute reliability." },
-                  { icon: <Shield />, title: "Zero Compromise", desc: "Security is baked into our DNA. We build systems that are resilient by design." },
-                  { icon: <Zap />, title: "Quantum Velocity", desc: "Radically fast deployment cycles powered by a modern, cloud-native tech stack." }
-                ].map((pillar, i) => (
-                  <ScrollReveal key={i} delay={i * 200} direction="up">
-                    <div className="p-16 bg-white/[0.02] backdrop-blur-sm border border-white/5 flex flex-col items-start gap-8 group hover:bg-white/5 transition-colors h-full">
+            {/* Core Pillars - Storytelling Stack */}
+            <section className="py-48 px-6 max-w-5xl mx-auto">
+              <ScrollReveal>
+                <div className="text-center mb-24 flex flex-col items-center">
+                  <TextType
+                    text="// System Pillars"
+                    className="text-xs font-bold text-white/30 uppercase tracking-[0.8em] mb-4 italic"
+                    speed={50}
+                  />
+                  <div className="h-32 w-full max-w-2xl">
+                    <TextPressure
+                      text="Core Framework"
+                      containerClassName="w-full h-full"
+                      className="text-4xl md:text-5xl font-black uppercase"
+                      flex={true}
+                      alpha={false}
+                      stroke={false}
+                      width={true}
+                      weight={true}
+                      italic={true}
+                      textColor="white"
+                    />
+                  </div>
+                </div>
+              </ScrollReveal>
 
-                      <div className="text-white/20 group-hover:text-white transition-colors transform group-hover:scale-110 duration-500">
-                        {pillar.icon}
-                      </div>
-                      <h3 className="text-xl font-bold tracking-widest uppercase">{pillar.title}</h3>
-                      <p className="text-white/40 leading-relaxed font-light">{pillar.desc}</p>
+              <ScrollStack
+                useWindowScroll={true}
+                className="max-w-4xl mx-auto"
+                itemDistance={80}
+                baseScale={0.9}
+                rotationAmount={2}
+                blurAmount={10}
+              >
+                {[
+                  { icon: <Code className="w-8 h-8" />, title: "Precision Engineering", desc: "Every micro-interaction is optimized for peak performance and absolute reliability. Our codebases are architected to withstand the tests of scale and time.", color: "bg-white/[0.03]" },
+                  { icon: <Shield className="w-8 h-8" />, title: "Zero Compromise", desc: "Security is baked into our DNA. We build systems that are resilient by design, utilizing military-grade encryption and zero-trust protocols.", color: "bg-blue-500/5" },
+                  { icon: <Zap className="w-8 h-8" />, title: "Quantum Velocity", desc: "Radically fast deployment cycles powered by a modern, cloud-native tech stack. We move at the speed of thought, ensuring your project hits the market first.", color: "bg-purple-500/5" },
+                  { icon: <Layers className="w-8 h-8" />, title: "Recursive Growth", desc: "Scalable architecture that evolves with your users. We don't just build for the present; we engineer for a decade of expansion.", color: "bg-white/[0.03]" }
+                ].map((pillar, i) => (
+                  <ScrollStackItem key={i} itemClassName={`border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center p-12 overflow-hidden ${pillar.color}`}>
+                    <div className="absolute top-0 right-0 p-8 text-white/5 text-8xl font-black select-none italic">
+                      0{i + 1}
                     </div>
-                  </ScrollReveal>
+                    <div className="text-white mb-8 transform group-hover:scale-110 transition-transform duration-500">
+                      {pillar.icon}
+                    </div>
+                    <h3 className="text-2xl font-black tracking-widest uppercase mb-6">{pillar.title}</h3>
+                    <p className="text-white/40 max-w-md leading-relaxed font-light">{pillar.desc}</p>
+                  </ScrollStackItem>
                 ))}
-              </div>
+              </ScrollStack>
             </section>
+
 
             {/* The Lab / Alexandria Section */}
             <section className="py-64 relative overflow-hidden">
-              <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-32 items-center">
+              {/* Metaballs Background Layer */}
+              <div className="absolute inset-0 z-0">
+                <MetaBalls
+                  color="rgba(255, 255, 255, 0.05)"
+                  cursorBallColor="rgba(255, 255, 255, 0.1)"
+                  numBalls={15}
+                  size={0.6}
+                  enableTransparency={true}
+                />
+              </div>
+
+              <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-32 items-center relative z-10">
                 <div>
                   <ScrollReveal direction="left">
-                    <div className="text-xs font-bold text-white/30 uppercase tracking-[0.5em] mb-8 italic">// Alexandria Node</div>
-                    <h2 className="text-5xl md:text-7xl font-black mb-12 tracking-tighter leading-[0.9]">
-                      BORN IN <span className="text-glow underline decoration-white/10 italic">EGYPT.</span><br />SCALED GLOBALLY.
-                    </h2>
+                    <TextType
+                      text="// Alexandria Node"
+                      className="text-xs font-bold text-white/30 uppercase tracking-[0.5em] mb-8 italic"
+                      speed={50}
+                    />
+                    <div className="h-48 mb-12">
+                      <TextPressure
+                        text="BORN IN EGYPT SCALED GLOBALLY"
+                        containerClassName="w-full h-full"
+                        className="text-4xl md:text-6xl font-black uppercase leading-tight"
+                        flex={true}
+                        width={true}
+                        weight={true}
+                        textColor="white"
+                      />
+                    </div>
                     <p className="text-xl text-white/40 font-light leading-relaxed mb-12 max-w-lg">
                       Strategic software development rooted in the cradle of civilization, delivering future-proof architecture to the modern world.
                     </p>
                     <div className="grid grid-cols-2 gap-12">
-                      <div>
-                        <div className="text-4xl font-black mb-2 logo-font">2026</div>
-                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Inception</div>
-                      </div>
-                      <div>
-                        <div className="text-4xl font-black mb-2 logo-font">100%</div>
-                        <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Uptime Target</div>
-                      </div>
+                      <Magnet padding={10}>
+                        <div className="p-6 border border-white/5 bg-white/[0.02] backdrop-blur-md">
+                          <div className="text-4xl font-black mb-2 logo-font">2026</div>
+                          <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Inception</div>
+                        </div>
+                      </Magnet>
+                      <Magnet padding={10}>
+                        <div className="p-6 border border-white/5 bg-white/[0.02] backdrop-blur-md">
+                          <div className="text-4xl font-black mb-2 logo-font">100%</div>
+                          <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Uptime Target</div>
+                        </div>
+                      </Magnet>
                     </div>
                   </ScrollReveal>
                 </div>
                 <div className="relative">
                   <ScrollReveal direction="right">
-                    <div className="aspect-square glass flex items-center justify-center p-24 animate-float">
-                      <div className="absolute inset-0 bg-white/5 blur-[120px] rounded-full" />
-                      <div className="text-[15rem] font-black text-white/[0.02] logo-font select-none">
-                        V1
+                    <div className="relative group">
+                      <FluidGlass
+                        className="aspect-square w-full rounded-2xl overflow-hidden grayscale contrast-125 opacity-40 group-hover:opacity-100 transition-opacity duration-1000"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center p-24 pointer-events-none">
+                        <StarBorder className="p-1 overflow-hidden" speed="6s">
+                          <div className="w-64 h-64 glass flex items-center justify-center relative overflow-hidden bg-black/40">
+                            <div className="absolute inset-0 bg-white/5 blur-[120px] rounded-full" />
+                            <div className="text-9xl font-black text-white/[0.05] logo-font select-none">
+                              V1
+                            </div>
+                            <Code className="absolute w-16 h-16 text-white/20" />
+                          </div>
+                        </StarBorder>
                       </div>
-                      <Code className="absolute w-32 h-32 text-white/10" />
                     </div>
                   </ScrollReveal>
                 </div>
               </div>
             </section>
+
 
             {/* Final Call */}
             <section className="py-64 flex flex-col items-center text-center px-6 border-t border-white/5">
@@ -146,10 +247,13 @@ function App() {
                 <h2 className="text-6xl md:text-9xl font-black mb-16 tracking-tighter logo-font">
                   LET'S <span className="text-glow italic">BUILD.</span>
                 </h2>
-                <Button size="xl" className="rounded-none px-24 py-10 bg-white text-black hover:scale-105 transition-all flex gap-6 mx-auto font-black uppercase tracking-widest text-xs">
-                  Initiate Connection <MessageSquare className="w-5 h-5" />
-                </Button>
+                <Magnet padding={30}>
+                  <Button size="xl" className="rounded-none px-24 py-10 bg-white text-black hover:scale-105 transition-all flex gap-6 mx-auto font-black uppercase tracking-widest text-xs">
+                    Initiate Connection <MessageSquare className="w-5 h-5" />
+                  </Button>
+                </Magnet>
               </ScrollReveal>
+
             </section>
           </main>
 
@@ -157,7 +261,10 @@ function App() {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-12 pt-16 border-t border-white/5">
               <div className="flex flex-col gap-6">
                 <div className="text-xl font-black tracking-tighter">ZERO TRACE</div>
-                <p className="text-white/20 text-[10px] font-bold uppercase tracking-widest">© 2026 | All Operations Logical</p>
+                <DecryptedText
+                  text="© 2026 | All Operations Logical"
+                  className="text-white/20 text-[10px] font-bold uppercase tracking-widest"
+                />
               </div>
               <div className="flex gap-16 text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
                 <a href="#" className="hover:text-white transition-colors">Endpoint</a>

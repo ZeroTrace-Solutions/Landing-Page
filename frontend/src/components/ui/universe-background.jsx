@@ -11,9 +11,10 @@ export const UniverseBackground = () => {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
 
-    const STAR_COUNT = 1000;
-    const OBJECT_COUNT = 25;
-    const CLOUD_COUNT = 15;
+    const STAR_COUNT = 3000;
+    const OBJECT_COUNT = 35;
+    const CLOUD_COUNT = 20;
+
     
     const BASE_SPEED = 1.2;
     const WARP_SPEED = 20;
