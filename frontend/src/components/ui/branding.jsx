@@ -31,24 +31,24 @@ export const Logo = ({ size = "lg", className = "" }) => {
   return (
     <div ref={logoRef} dir="ltr" className={`flex flex-col items-center justify-center text-white ${className}`}>
       {/* Official Logo.png Mark */}
-      <div ref={logoMarkRef} className="relative mb-8 select-none">
-        <img 
-          src="/logo.png" 
-          alt="ZeroTrace" 
-          className="w-48 md:w-64 h-auto object-contain drop-shadow-[0_0_50px_rgba(255,255,255,0.4)] brightness-110"
+      <div ref={logoMarkRef} className="relative mb-5 select-none">
+        <img
+          src="/logo.png"
+          alt="ZeroTrace"
+          className="w-32 sm:w-48 md:w-64 h-auto object-contain drop-shadow-[0_0_50px_rgba(255,255,255,0.4)] brightness-110"
         />
       </div>
 
 
       {/* Synchronized Typography */}
       <div ref={textRef} className="flex flex-col items-center">
-        <h1 className="text-6xl md:text-8xl font-black tracking-tight logo-font text-glow flex">
+        <h1 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tight logo-font text-glow flex">
           {"ZERO TRACE".split("").map((l, i) => (
             <span key={i} className="letter inline-block">{l === " " ? "\u00A0" : l}</span>
           ))}
         </h1>
         <div className="mt-4 flex justify-center w-full">
-          <h2 className="text-lg md:text-2xl font-light tracking-[0.8em] sub-logo-font text-white/30 -mr-[0.8em] flex">
+          <h2 className="text-[10px] sm:text-lg md:text-2xl font-light tracking-[0.8em] sub-logo-font text-white/30 -mr-[0.8em] flex">
             {"SOLUTIONS".split("").map((l, i) => (
               <span key={i} className="letter inline-block">{l}</span>
             ))}

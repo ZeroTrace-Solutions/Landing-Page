@@ -56,9 +56,15 @@ const TextPressure = ({
   const [scaleY, setScaleY] = useState(1);
   const [lineHeight, setLineHeight] = useState(1);
 
-  // if text contains Arabic characters, don't split into individual spans
+  // if text contains Arabic characters, split into words to preserve ligation
   const isRTL = /[\u0600-\u06FF]/.test(text);
-  const chars = isRTL ? [text] : text.split('');
+  const chars = useMemo(() => {
+    if (isRTL) {
+      // Split by words and filter out empty strings
+      return text.split(/(\s+)/).filter(s => s.trim().length > 0 || s.length > 0);
+    }
+    return text.split('');
+  }, [text, isRTL]);
 
   useEffect(() => {
     const handleMouseMove = e => {
@@ -93,8 +99,10 @@ const TextPressure = ({
 
     const { width: containerW, height: containerH } = containerRef.current.getBoundingClientRect();
 
+    // Arabic characters are wider/taller, adjust sizing factor
     const count = isRTL ? text.length : chars.length;
-    let newFontSize = containerW / (count / 2);
+    const factor = isRTL ? 1.2 : 2;
+    let newFontSize = containerW / (count / factor);
     newFontSize = Math.max(newFontSize, minFontSize);
 
     setFontSize(newFontSize);
@@ -111,7 +119,7 @@ const TextPressure = ({
         setLineHeight(yRatio);
       }
     });
-  }, [chars.length, minFontSize, scale]);
+  }, [chars.length, minFontSize, scale, isRTL, text.length]);
 
   useEffect(() => {
     const debouncedSetSize = debounce(setSize, 100);
@@ -220,9 +228,8 @@ const TextPressure = ({
       <h1
         ref={titleRef}
         dir={isRTL ? 'rtl' : undefined}
-        className={`text-pressure-title ${className} ${
-          flex ? 'flex justify-between' : ''
-        } ${stroke ? 'stroke' : ''} ${isRTL ? '' : 'uppercase'} text-center`}
+        className={`text-pressure-title ${className} ${flex && !isRTL ? 'flex justify-between' : 'flex justify-center gap-[0.2em]'
+          } ${stroke ? 'stroke' : ''} ${isRTL ? '' : 'uppercase'} text-center`}
         style={{
           ...(fontFamily !== 'inherit' ? { fontFamily } : {}),
           fontSize: fontSize,

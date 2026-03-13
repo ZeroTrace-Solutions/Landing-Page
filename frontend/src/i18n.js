@@ -9,15 +9,27 @@ const resources = {
   ar: { translation: ar }
 };
 
+const getInitialLanguage = () => {
+  const saved = localStorage.getItem('app-language');
+  if (saved) return saved;
+
+  const browserLang = navigator.language.split('-')[0];
+  return resources[browserLang] ? browserLang : 'en';
+};
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en',
+    lng: getInitialLanguage(),
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false
     }
   });
+
+i18n.on('languageChanged', (lng) => {
+  localStorage.setItem('app-language', lng);
+});
 
 export default i18n;

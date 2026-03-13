@@ -1,5 +1,5 @@
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
-import { Code, Shield, Zap, Layers } from 'lucide-react'
+import { Search, Shield, Zap, Infinity, ArrowUpRight, Lock } from 'lucide-react'
 import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
 import TextPressure from '@/components/TextPressure'
 import TextType from '@/components/TextType'
@@ -19,7 +19,7 @@ export const CorePillars = () => {
           />
           <div className="h-32 w-full">
             <TextPressure
-              text={t('coreFramework')}
+              text={t('strategicFramework')}
               containerClassName="w-full h-full"
               className="text-4xl md:text-5xl font-black uppercase"
               flex={true}
@@ -44,14 +44,15 @@ export const CorePillars = () => {
           blurAmount={10}
         >
           {[
-            { icon: <Code className="w-8 h-8" />, titleKey: "precisionEngineering", descKey: "descPrecision", color: "bg-white/[0.03]" },
-            { icon: <Shield className="w-8 h-8" />, titleKey: "zeroCompromise", descKey: "descSecurity", color: "bg-blue-500/5" },
-            { icon: <Zap className="w-8 h-8" />, titleKey: "quantumVelocity", descKey: "descVelocity", color: "bg-purple-500/5" },
-            { icon: <Layers className="w-8 h-8" />, titleKey: "recursiveGrowth", descKey: "descGrowth", color: "bg-white/[0.03]" }
+            { icon: <Search className="w-8 h-8" />, titleKey: "strategicDiscovery", descKey: "descDiscovery", color: "bg-white/[0.03]" },
+            { icon: <Infinity className="w-8 h-8" />, titleKey: "totalLifecycle", descKey: "descLifecycle", color: "bg-blue-500/5" },
+            { icon: <Zap className="w-8 h-8" />, titleKey: "agileResponse", descKey: "descResponse", color: "bg-purple-500/5" },
+            { icon: <ArrowUpRight className="w-8 h-8" />, titleKey: "elasticScaling", descKey: "descScaling", color: "bg-white/[0.03]" },
+            { icon: <Lock className="w-8 h-8" />, titleKey: "zeroTraceSecurity", descKey: "descZeroTrace", color: "bg-blue-500/5" }
           ].map((pillar, i) => (
             <ScrollStackItem key={i} itemClassName={`border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center p-12 overflow-hidden ${pillar.color}`}>
               <div className="absolute top-0 right-0 p-8 text-white/5 text-8xl font-black select-none italic">
-                0{i + 1}
+                {t('pillarIndex', { index: i + 1 })}
               </div>
               <div className="text-white mb-8 transform group-hover:scale-110 transition-transform duration-500">
                 {pillar.icon}

@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { animate } from 'animejs';
 
+import { useTranslation } from 'react-i18next';
+
 export const VideoIntro = ({ onComplete }) => {
+  const { t, i18n } = useTranslation();
   const [isVideoEnded, setIsVideoEnded] = useState(false);
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -59,9 +62,9 @@ export const VideoIntro = ({ onComplete }) => {
       
       <button 
         onClick={handleVideoEnd}
-        className="absolute bottom-10 right-10 z-[110] px-6 py-2 glass rounded-full text-white/50 text-sm hover:text-white transition-colors uppercase tracking-widest"
+        className={`absolute bottom-10 ${i18n.language === 'ar' ? 'left-10' : 'right-10'} z-[110] px-6 py-2 glass rounded-full text-white/50 text-sm hover:text-white transition-colors uppercase tracking-widest`}
       >
-        Skip Intro
+        {t('skipIntro')}
       </button>
     </div>
   );

@@ -9,10 +9,10 @@ import Lighthouse3D from '@/components/Lighthouse3D'
 import { useTranslation } from 'react-i18next'
 
 export const AlexandriaLab = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
-    <section id="manifesto" className="py-64 relative overflow-hidden">
+    <section id="manifesto" className="py-32 md:py-64 relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <MetaBalls
           color="#00ffff"
@@ -23,7 +23,7 @@ export const AlexandriaLab = () => {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-32 items-center relative z-10">
+      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 md:gap-32 items-center relative z-10">
         <div>
           <ScrollReveal direction="left">
             <TextType
@@ -31,7 +31,7 @@ export const AlexandriaLab = () => {
               className="text-xs font-bold text-white/30 uppercase tracking-[0.5em] mb-8 italic"
               speed={50}
             />
-            <div className="h-48 mb-12">
+            <div className={`h-32 md:h-48 mb-12 transform transition-transform duration-500 ${i18n.language === 'ar' ? '-translate-x-[-50px]' : ''}`}>
               <TextPressure
                 text={t('bornEgypt')}
                 containerClassName="w-full h-full"
@@ -40,21 +40,22 @@ export const AlexandriaLab = () => {
                 width={true}
                 weight={true}
                 textColor="white"
+                minFontSize={40}
               />
             </div>
-            <p className="text-xl text-white/40 font-light leading-relaxed mb-12 max-w-lg">
+            <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed mb-12 max-w-lg">
               {t('alexandriaParagraph')}
             </p>
-            <div className="grid grid-cols-2 gap-12">
+            <div className="grid grid-cols-2 gap-6 sm:gap-12">
               <Magnet padding={10}>
                 <div className="p-6 border border-white/5 bg-white/[0.02] backdrop-blur-md">
-                  <div className="text-4xl font-black mb-2 logo-font">2026</div>
+                  <div className="text-4xl font-black mb-2 logo-font">{t('inceptionYear')}</div>
                   <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{t('inception')}</div>
                 </div>
               </Magnet>
               <Magnet padding={10}>
                 <div className="p-6 border border-white/5 bg-white/[0.02] backdrop-blur-md">
-                  <div className="text-4xl font-black mb-2 logo-font">100%</div>
+                  <div className="text-4xl font-black mb-2 logo-font">{t('uptimeValue')}</div>
                   <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{t('uptimeTarget')}</div>
                 </div>
               </Magnet>

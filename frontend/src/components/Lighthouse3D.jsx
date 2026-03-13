@@ -63,7 +63,7 @@ const LighthouseModel = () => {
 export const Lighthouse3D = () => {
   return (
     <div className="w-full h-full aspect-square relative cursor-grab active:cursor-grabbing">
-      <Canvas 
+      <Canvas
         camera={{ position: [0, 2, 18], fov: 40 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => {
@@ -73,19 +73,19 @@ export const Lighthouse3D = () => {
         <ambientLight intensity={0.8} />
         <pointLight position={[10, 10, 10]} intensity={1.5} />
         <pointLight position={[-10, 5, -10]} intensity={1} color="#ffffff" />
-        
-        <Float 
-          speed={1.5} 
-          rotationIntensity={0.8} 
+
+        <Float
+          speed={1.5}
+          rotationIntensity={0.8}
           floatIntensity={1.2}
           floatingRange={[-0.5, 0.5]}
         >
           <LighthouseModel />
         </Float>
 
-        <OrbitControls 
-          enableZoom={false} 
-          enablePan={false} 
+        <OrbitControls
+          enableZoom={false}
+          enablePan={false}
           minPolarAngle={Math.PI / 4}
           maxPolarAngle={Math.PI / 1.5}
         />

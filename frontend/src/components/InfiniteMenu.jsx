@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mat4, quat, vec2, vec3 } from 'gl-matrix';
 
 const discVertShaderSource = `#version 300 es
@@ -969,9 +970,12 @@ const defaultItems = [
 ];
 
 const InfiniteMenu = ({ items = [], scale = 1.0 }) => {
+  const { i18n } = useTranslation();
   const canvasRef = useRef(null);
   const [activeItem, setActiveItem] = useState(null);
   const [isMoving, setIsMoving] = useState(false);
+
+  const isRTL = i18n.language === 'ar';
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1026,44 +1030,48 @@ const InfiniteMenu = ({ items = [], scale = 1.0 }) => {
       {activeItem && (
         <>
           <h2
+            dir={isRTL ? 'rtl' : 'ltr'}
             className={`
           select-none
           absolute
           font-black
-          [font-size:4rem]
-          left-[1.6em]
-          top-1/2
+          text-3xl sm:text-5xl md:text-7xl
+          w-full text-center ${isRTL ? 'sm:text-right' : 'sm:text-left'}
+          ${isRTL ? 'right-0 sm:right-[1.6em]' : 'left-0 sm:left-[1.6em]'}
+          top-[40%] sm:top-1/2
           transform
-          translate-x-[20%]
+          ${isRTL ? 'sm:-translate-x-[20%]' : 'sm:translate-x-[20%]'}
           -translate-y-1/2
           transition-all
           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          text-glow
+          text-glow px-6
           ${isMoving
-                ? 'opacity-0 pointer-events-none duration-[100ms]'
-                : 'opacity-100 pointer-events-auto duration-[500ms]'
+                ? 'opacity-0 pointer-events-none duration-[100ms] scale-95'
+                : 'opacity-100 pointer-events-auto duration-[500ms] scale-100'
               }
         `}>
-            {activeItem.title}
+            {isRTL ? (activeItem.titleAr || activeItem.title) : activeItem.title}
           </h2>
 
           <p
+            dir={isRTL ? 'rtl' : 'ltr'}
             className={`
           select-none
           absolute
-          max-w-[10ch]
-          text-[1.5rem]
-          top-1/2
-          right-[1%]
+          w-full text-center ${isRTL ? 'sm:text-right' : 'sm:text-left'}
+          max-w-none sm:max-w-[20ch]
+          text-sm sm:text-base md:text-[1.5rem]
+          bottom-[25%] sm:top-1/2
+          ${isRTL ? 'right-0 sm:right-auto sm:left-[1%]' : 'left-0 sm:left-auto sm:right-[1%]'}
           transition-all
           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          text-glow
+          text-glow px-10
           ${isMoving
-                ? 'opacity-0 pointer-events-none duration-[100ms] translate-x-[-60%] -translate-y-1/2'
-                : 'opacity-100 pointer-events-auto duration-[500ms] translate-x-[-90%] -translate-y-1/2'
+                ? `opacity-0 pointer-events-none duration-[100ms] translate-y-4 ${isRTL ? 'sm:translate-x-[60%]' : 'sm:translate-x-[-60%]'} sm:-translate-y-1/2`
+                : `opacity-100 pointer-events-auto duration-[500ms] translate-y-0 ${isRTL ? 'sm:translate-x-[90%]' : 'sm:translate-x-[-90%]'} sm:-translate-y-1/2`
               }
         `}>
-            {activeItem.description}
+            {isRTL ? (activeItem.descriptionAr || activeItem.description) : activeItem.description}
           </p>
 
           <div

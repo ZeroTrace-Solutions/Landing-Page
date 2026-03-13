@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export const FinalCall = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const contactOptions = [
@@ -34,23 +34,23 @@ export const FinalCall = () => {
   ];
 
   return (
-    <section id='begin' className="py-64 flex flex-col items-center text-center px-6 border-t border-white/5 relative bg-black">
+    <section id='begin' className="py-32 md:py-64 flex flex-col items-center text-center px-6 border-t border-white/5 relative bg-black">
       <div className="max-w-4xl mx-auto">
         <ScrollReveal direction="up" distance={50} duration={1}>
           <DecryptedText
             text={t('executeFinalCommand')}
             animateOn="view"
             revealDirection="center"
-            className="text-xs font-bold text-white/30 uppercase tracking-[0.8em] mb-12 italic"
+            className="text-[10px] sm:text-xs font-bold text-white/30 uppercase tracking-[0.8em] mb-12 italic"
           />
         </ScrollReveal>
 
         <ScrollReveal direction="up" distance={100} duration={1.5} delay={200}>
-          <div className="h-48 md:h-64 w-full max-w-4xl  mx-auto">
+          <div className={`h-48 md:h-64 w-full max-w-4xl mx-auto transform transition-transform duration-500 ${i18n.language === 'ar' ? '-translate-x-[-150px]' : ''}`}>
             <TextPressure
               text={t('letsBuild')}
               containerClassName="w-full h-full"
-              className="text-6xl md:text-9xl font-black uppercase tracking-tighter"
+              className="text-4xl sm:text-6xl md:text-9xl font-black uppercase tracking-tighter"
               flex={true}
               alpha={false}
               stroke={false}
@@ -68,7 +68,7 @@ export const FinalCall = () => {
               <Button
                 size="xl"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`rounded-none px-24 py-10 transition-all flex gap-6 mx-auto font-black uppercase tracking-widest text-xs z-20 ${isOpen ? 'bg-white/10 text-white border border-white/20' : 'bg-white text-black'
+                className={`rounded-none px-12 sm:px-24 py-10 transition-all flex gap-6 mx-auto font-black uppercase tracking-widest text-xs z-20 ${isOpen ? 'bg-white/10 text-white border border-white/20' : 'bg-white text-black'
                   }`}
               >
                 {isOpen ? (
@@ -85,7 +85,7 @@ export const FinalCall = () => {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="flex gap-4 z-10"
+                  className="flex flex-wrap justify-center gap-4 z-10"
                 >
                   {contactOptions.map((opt, i) => (
                     <motion.div

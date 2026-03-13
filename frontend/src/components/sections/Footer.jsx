@@ -18,17 +18,17 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="pb-32 px-12 relative z-10">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-12 pt-16 border-t border-white/5">
-        <div className="flex flex-col gap-6">
-          <div className="text-xl font-black tracking-tighter">ZERO TRACE</div>
+    <footer className="pb-32 px-6 md:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-end gap-8 md:gap-12 pt-16 border-t border-white/5">
+        <div className="flex flex-col gap-6 text-center md:text-left items-center md:items-start">
+          <div className="text-xl font-black tracking-tighter">ZT Solutions</div>
           <DecryptedText
             text={t('footerCopyright')}
             className="text-white/20 text-[10px] font-bold uppercase tracking-widest"
           />
         </div>
-        <div className="flex flex-col gap-6 items-end">
-          <div className="flex gap-16 text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
+        <div className="flex flex-col gap-6 items-center md:items-end">
+          <div className="flex flex-wrap justify-center md:justify-end gap-8 sm:gap-16 text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
             <a href="https://github.com/ZeroTrace-Solutions" target="_blank" rel="noopener noreferrer" onClick={(e) => handleNavClick(e, 0)} className="hover:text-white transition-colors">{t('libraries')}</a>
             <a href="#solutions" onClick={(e) => handleNavClick(e, '#solutions')} className="hover:text-white transition-colors">{t('protocol')}</a>
             <a href="https://github.com/ZeroTrace-Solutions" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">{t('source')}</a>

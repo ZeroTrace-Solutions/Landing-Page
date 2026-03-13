@@ -28,7 +28,7 @@ export const Hero = () => {
         </ScrollReveal>
       </div>
 
-      <div className="w-full flex flex-col items-center -mt-32 pb-32">
+      <div className="w-full flex flex-col items-center -mt-16 md:-mt-32 pb-32">
         <ScrollReveal delay={400} distance={40} direction="up" duration={1.2}>
           <div className="max-w-xl mx-auto text-center mb-16 px-4">
             <GradualBlur
@@ -46,7 +46,7 @@ export const Hero = () => {
                 size="xl" 
                 className="rounded-none px-16 bg-white text-black hover:bg-white/90 transition-all font-black uppercase tracking-[0.2em] text-xs shadow-[0_0_30px_rgba(255,255,255,0.2)]"
               >
-                Initialize Project
+                {t('initializeProject')}
               </Button>
             </Magnet>
             <Magnet padding={20}>

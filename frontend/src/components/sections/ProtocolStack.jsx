@@ -3,6 +3,7 @@ import { Cpu } from 'lucide-react'
 import Magnet from '@/components/Magnet'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useState, useEffect } from 'react'
 import TextPressure from '@/components/TextPressure'
 import TextType from '@/components/TextType'
 import CardSwap, { Card } from '@/components/CardSwap'
@@ -10,7 +11,17 @@ import { Button } from '../ui/button'
 
 export const ProtocolStack = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 768;
+  const isSmallMobile = windowWidth < 480;
 
   return (
     <section id="solutions" className="py-32 px-6 relative overflow-hidden border-t border-white/5">
@@ -22,11 +33,11 @@ export const ProtocolStack = () => {
               className="text-xs font-bold text-white/30 uppercase tracking-[0.5em] mb-8 italic"
               speed={50}
             />
-            <div className="h-32 mb-8">
+            <div className={`h-32 mb-8 transform transition-transform duration-500 ${i18n.language === 'ar' ? '-translate-x-[-150px]' : ''}`}>
               <TextPressure
-                text="SYSTEMIC LOGIC"
+                text={t('systemicLogic')}
                 containerClassName="w-full h-full"
-                className="text-5xl md:text-7xl font-black uppercase"
+                className="text-4xl md:text-7xl font-black uppercase"
                 flex={true}
                 width={true}
                 weight={true}
@@ -34,7 +45,7 @@ export const ProtocolStack = () => {
               />
             </div>
             <p className="text-lg text-white/40 font-light leading-relaxed max-w-md mb-12">
-              Our methodology is defined by three recursive layers of development, ensuring absolute stability from kernel to interface. We translate complex requirements into streamlined, mathematical architectures.
+              {t('protocolDescription')}
             </p>
             <div className="flex items-center gap-6">
               <div className="h-px w-12 bg-white/20" />
@@ -62,10 +73,10 @@ export const ProtocolStack = () => {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white/[0.02] rounded-full blur-[100px] pointer-events-none" />
 
             <CardSwap
-              width={400}
-              height={500}
-              cardDistance={50}
-              verticalDistance={60}
+              width={isSmallMobile ? 320 : isMobile ? 360 : 400}
+              height={isSmallMobile ? 450 : isMobile ? 480 : 500}
+              cardDistance={isMobile ? 30 : 50}
+              verticalDistance={isMobile ? 40 : 60}
               delay={4500}
               pauseOnHover={true}
               easing="power"
@@ -73,24 +84,24 @@ export const ProtocolStack = () => {
               {[
                 {
                   titleKey: "architecture",
-                  subtitle: "Structural Integrity",
+                  subtitleKey: "structuralIntegrity",
                   layer: "Layer 01",
-                  desc: "Mathematical models define our data structures, ensuring O(1) efficiency where it matters most. We architect for scale before the first line of code is committed."
+                  descKey: "descArch"
                 },
                 {
                   titleKey: "zeroTrust",
-                  subtitle: "Immutable Security",
+                  subtitleKey: "immutableSecurity",
                   layer: "Layer 02",
-                  desc: "Every interaction is validated. Our security protocols aren't an afterthought; they are the foundation. Logic is isolated, immutable, and fully verifiable."
+                  descKey: "descZeroTrust"
                 },
                 {
                   titleKey: "autonomy",
-                  subtitle: "Self-Healing Edges",
+                  subtitleKey: "selfHealingEdges",
                   layer: "Layer 03",
-                  desc: "Digital infrastructure that manages itself through automated scaling and self-healing deployment pipelines optimized for global edge delivery and zero latency."
+                  descKey: "descAutonomy"
                 }
               ].map((step, i) => (
-                <Card key={i} className="border-white/10 bg-white/[0.02] backdrop-blur-2xl p-10 flex flex-col justify-between hover:border-white/20 transition-all duration-500 rounded-2xl">
+                <Card key={i} className="border-white/10 bg-white/[0.02] backdrop-blur-2xl p-6 sm:p-10 flex flex-col justify-between hover:border-white/20 transition-all duration-500 rounded-2xl">
                   <div className="relative z-10">
                     <div className="flex justify-between items-start mb-12">
                       <div className="text-white/20 text-[10px] font-bold uppercase tracking-[0.4em]">
@@ -98,22 +109,22 @@ export const ProtocolStack = () => {
                       </div>
                       <Cpu className="w-5 h-5 text-white/10" />
                     </div>
-                    <h3 className="text-4xl font-black uppercase tracking-tighter mb-6">
+                    <h3 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter mb-6">
                       {t(step.titleKey)}
                     </h3>
                     <div className="w-16 h-1 bg-white/10 mb-8" />
                     <p className="text-white/40 leading-relaxed font-light text-sm md:text-base">
-                      {step.desc}
+                      {t(step.descKey)}
                     </p>
                   </div>
 
                   <div className="relative z-10 flex flex-col gap-4">
                     <div className="flex items-center gap-3 text-[10px] font-bold text-white/30 uppercase tracking-widest">
                       <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
-                      {step.subtitle}
+                      {t(step.subtitleKey)}
                     </div>
                     <div className="text-[9px] text-white/10 font-mono">
-                      EXEC_STATUS: OPTIMIZED
+                      {t('execStatus')}
                     </div>
                   </div>
 
