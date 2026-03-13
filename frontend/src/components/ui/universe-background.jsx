@@ -15,7 +15,7 @@ export const UniverseBackground = () => {
     const OBJECT_COUNT = 35;
     const CLOUD_COUNT = 20;
 
-    
+
     const BASE_SPEED = 1.2;
     const WARP_SPEED = 20;
     let currentSpeed = BASE_SPEED;
@@ -24,7 +24,7 @@ export const UniverseBackground = () => {
       canvas.width = window.innerWidth * window.devicePixelRatio;
       canvas.height = window.innerHeight * window.devicePixelRatio;
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-      
+
       if (isFirstMove.current) {
         pointer.current.x = window.innerWidth / 2;
         pointer.current.y = window.innerHeight / 2;
@@ -36,7 +36,7 @@ export const UniverseBackground = () => {
     const project = (x, y, z) => {
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
-      
+
       const scale = 1000 / (z || 1);
       return {
         x: x * scale + centerX,
@@ -51,7 +51,7 @@ export const UniverseBackground = () => {
       const dy = y - pointer.current.smoothY;
       const dist = Math.sqrt(dx * dx + dy * dy);
       const radius = 250; // Force field radius
-      
+
       if (dist < radius) {
         const force = (radius - dist) / radius;
         const push = force * 60; // How far they get pushed
@@ -83,7 +83,7 @@ export const UniverseBackground = () => {
       draw() {
         const p1 = project(this.x, this.y, this.z);
         const p2 = project(this.x, this.y, this.pz);
-        
+
         // Apply Repulsion to current and prev points
         const r1 = applyRepulsion(p1.x, p1.y);
         const r2 = applyRepulsion(p2.x, p2.y);
@@ -151,7 +151,7 @@ export const UniverseBackground = () => {
         const cy = p.y + r.oy;
 
         if (this.type === 'planet') {
-          const grd = ctx.createRadialGradient(cx - size/3, cy - size/3, 0, cx, cy, size);
+          const grd = ctx.createRadialGradient(cx - size / 3, cy - size / 3, 0, cx, cy, size);
           grd.addColorStop(0, '#fff');
           grd.addColorStop(0.3, this.color.replace(')', ` / ${alpha})`));
           grd.addColorStop(1, '#000');
@@ -160,10 +160,10 @@ export const UniverseBackground = () => {
         } else {
           ctx.shadowBlur = 40; ctx.shadowColor = this.color;
           ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-          ctx.beginPath(); ctx.arc(cx, cy, size/10, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(cx, cy, size / 10, 0, Math.PI * 2); ctx.fill();
           ctx.shadowBlur = 0;
           const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, size);
-          grd.addColorStop(0, this.color.replace(')', ` / ${alpha*0.6})`));
+          grd.addColorStop(0, this.color.replace(')', ` / ${alpha * 0.6})`));
           grd.addColorStop(1, 'transparent');
           ctx.fillStyle = grd;
           ctx.beginPath(); ctx.arc(cx, cy, size, 0, Math.PI * 2); ctx.fill();
@@ -209,7 +209,7 @@ export const UniverseBackground = () => {
     <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none bg-black">
       <canvas ref={canvasRef} className="w-full h-full block" />
       {/* Black Hole Core Overlay - Subtle visual hint of the center of repulsion */}
-      <div 
+      <div
         className="absolute w-[400px] h-[400px] rounded-full pointer-events-none opacity-20"
         style={{
           left: pointer.current.x,

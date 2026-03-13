@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { useLenis } from 'lenis/react'
+import { Library } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export const Header = () => {
@@ -60,11 +61,10 @@ export const Header = () => {
   ]
 
   return (
-    <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 flex justify-between items-center animate-in fade-in ${
-      isScrolled 
-        ? 'py-4 px-8 glass-dark bg-black/40 backdrop-blur-xl border-b border-white/5 shadow-2xl' 
-        : 'py-8 px-8 bg-transparent'
-    }`}>
+    <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 flex justify-between items-center animate-in fade-in ${isScrolled
+      ? 'py-4 px-8 glass-dark bg-black/40 backdrop-blur-xl border-b border-white/5 shadow-2xl'
+      : 'py-8 px-8 bg-transparent'
+      }`}>
       <div className="flex items-center gap-4">
         <div className="w-10 h-px bg-white/20" />
         <span className="text-xs font-bold tracking-[0.4em] uppercase text-white/40">Alexandria 2026</span>
@@ -75,16 +75,27 @@ export const Header = () => {
             key={link.id}
             href={link.href}
             onClick={(e) => handleNavClick(e, link.href)}
-            className={`transition-all duration-300 hover:text-white ${
-              activeSection === link.id ? 'text-white' : ''
-            }`}
+            className={`transition-all duration-300 hover:text-white ${activeSection === link.id ? 'text-white' : ''
+              }`}
           >
             {link.label}
           </a>
         ))}
       </nav>
-      <Button variant="outline" size="sm" className="rounded-none border-white/10 glass-dark hover:bg-white hover:text-black transition-all px-8 uppercase tracking-widest text-[10px]">
-        Secure Node
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="p-3 text-white/40 hover:text-white hover:bg-white/5 transition-all rounded-full border border-white/5"
+      >
+        <a
+          href="https://github.com/ZeroTrace-Solutions"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Library"
+        >
+          <Library className="w-5 h-5 transition-transform group-hover:scale-110" />
+        </a>
       </Button>
     </header>
   )

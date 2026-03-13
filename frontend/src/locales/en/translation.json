@@ -43,7 +43,11 @@
   "inception": "Inception",
   "uptimeTarget": "Uptime Target",
   "footerCopyright": "© 2026 | All Operations Logical",
-  "endpoint": "Endpoint",
+  "libraries": "Libraries",
   "protocol": "Protocol",
-  "source": "Source"
+  "source": "Source",
+  "linkedin": "LinkedIn",
+  "github": "GitHub",
+  "instagram": "Instagram",
+  "facebook": "Facebook"
 }

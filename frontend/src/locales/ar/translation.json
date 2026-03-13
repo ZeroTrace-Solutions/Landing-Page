@@ -43,7 +43,11 @@
   "inception": "البداية",
   "uptimeTarget": "هدف التشغيل المستمر",
   "footerCopyright": "© 2026 | كل العمليات منطقية",
-  "endpoint": "نقطة النهاية",
+  "libraries": "المكتبات",
   "protocol": "البروتوكول",
-  "source": "المصدر"
+  "source": "المصدر",
+  "linkedin": "لينكد إن",
+  "github": "جيت هب",
+  "instagram": "إنستغرام",
+  "facebook": "فيسبوك"
 }

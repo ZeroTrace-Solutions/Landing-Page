@@ -740,16 +740,16 @@ class InfiniteGridMenu {
         img.onload = () => resolve(img);
         img.src = item.image;
       }))).then(images => {
-      images.forEach((img, i) => {
-        const x = (i % this.atlasSize) * cellSize;
-        const y = Math.floor(i / this.atlasSize) * cellSize;
-        ctx.drawImage(img, x, y, cellSize, cellSize);
-      });
+        images.forEach((img, i) => {
+          const x = (i % this.atlasSize) * cellSize;
+          const y = Math.floor(i / this.atlasSize) * cellSize;
+          ctx.drawImage(img, x, y, cellSize, cellSize);
+        });
 
-      gl.bindTexture(gl.TEXTURE_2D, this.tex);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
-      gl.generateMipmap(gl.TEXTURE_2D);
-    });
+        gl.bindTexture(gl.TEXTURE_2D, this.tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+        gl.generateMipmap(gl.TEXTURE_2D);
+      });
   }
 
   initDiscInstances(count) {
@@ -1039,11 +1039,10 @@ const InfiniteMenu = ({ items = [], scale = 1.0 }) => {
           transition-all
           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
           text-glow
-          ${
-            isMoving
-              ? 'opacity-0 pointer-events-none duration-[100ms]'
-              : 'opacity-100 pointer-events-auto duration-[500ms]'
-          }
+          ${isMoving
+                ? 'opacity-0 pointer-events-none duration-[100ms]'
+                : 'opacity-100 pointer-events-auto duration-[500ms]'
+              }
         `}>
             {activeItem.title}
           </h2>
@@ -1059,11 +1058,10 @@ const InfiniteMenu = ({ items = [], scale = 1.0 }) => {
           transition-all
           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
           text-glow
-          ${
-            isMoving
-              ? 'opacity-0 pointer-events-none duration-[100ms] translate-x-[-60%] -translate-y-1/2'
-              : 'opacity-100 pointer-events-auto duration-[500ms] translate-x-[-90%] -translate-y-1/2'
-          }
+          ${isMoving
+                ? 'opacity-0 pointer-events-none duration-[100ms] translate-x-[-60%] -translate-y-1/2'
+                : 'opacity-100 pointer-events-auto duration-[500ms] translate-x-[-90%] -translate-y-1/2'
+              }
         `}>
             {activeItem.description}
           </p>
@@ -1086,11 +1084,10 @@ const InfiniteMenu = ({ items = [], scale = 1.0 }) => {
           transition-all
           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
           shadow-glow
-          ${
-            isMoving
-              ? 'bottom-[-80px] opacity-0 pointer-events-none duration-[100ms] scale-0 -translate-x-1/2'
-              : 'bottom-[3.8em] opacity-100 pointer-events-auto duration-[500ms] scale-100 -translate-x-1/2'
-          }
+          ${isMoving
+                ? 'bottom-[-80px] opacity-0 pointer-events-none duration-[100ms] scale-0 -translate-x-1/2'
+                : 'bottom-[3.8em] opacity-100 pointer-events-auto duration-[500ms] scale-100 -translate-x-1/2'
+              }
         `}>
             <p className="select-none relative text-[#060010] top-[2px] text-[26px]">&#x2197;</p>
           </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import i18n from './i18n'
 import { UniverseBackground } from '@/components/ui/universe-background'
@@ -19,6 +20,7 @@ import { Portfolio } from '@/pages/Portfolio'
 function App() {
   const { i18n: i18nObj, t } = useTranslation();
   const [showContent, setShowContent] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const lang = i18nObj.language || 'en';
@@ -34,9 +36,8 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <div className="relative min-h-screen bg-transparent text-white selection:bg-white/20">
-        <UniverseBackground />
+    <div className="relative min-h-screen bg-transparent text-white selection:bg-white/20">
+      <UniverseBackground />
 
         <SplashCursor
           SPLAT_RADIUS={0.08}
@@ -51,39 +52,57 @@ function App() {
 
         <VideoIntro onComplete={() => setShowContent(true)} />
 
-        <Routes>
-          <Route
-            path="/"
-            element={
-              showContent && (
-                <>
-                  {/* Overlay Layers - Glass Nebula */}
-                  <div className="fixed inset-0 bg-space-gradient pointer-events-none mix-blend-screen opacity-10 z-[2]" />
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route
+              path="/"
+              element={
+                showContent && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                  >
+                    {/* Overlay Layers - Glass Nebula */}
+                    <div className="fixed inset-0 bg-space-gradient pointer-events-none mix-blend-screen opacity-10 z-[2]" />
 
-                  <Header />
+                    <Header />
 
-                  <main className="relative z-10">
-                    <Hero />
-                    <ScrollBeam />
+                    <main className="relative z-10">
+                      <Hero />
+                      <ScrollBeam />
 
-                    <CorePillars />
+                      <CorePillars />
 
-                    <ProtocolStack />
+                      <ProtocolStack />
 
-                    <AlexandriaLab />
+                      <AlexandriaLab />
 
-                    <FinalCall />
-                  </main>
+                      <FinalCall />
+                    </main>
 
-                  <Footer />
-                </>
-              )
-            }
-          />
-          <Route path="/portfolio" element={<Portfolio />} />
-        </Routes>
+                    <Footer />
+                  </motion.div>
+                )
+              }
+            />
+            <Route 
+              path="/portfolio" 
+              element={
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                  <Portfolio />
+                </motion.div>
+              } 
+            />
+          </Routes>
+        </AnimatePresence>
       </div>
-    </BrowserRouter>
   );
 }
 

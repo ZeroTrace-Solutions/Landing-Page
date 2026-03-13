@@ -1,5 +1,5 @@
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
-import { MessageSquare, Mail, X, MessageCircle } from 'lucide-react'
+import { MessageSquare, Mail, X, MessageCircle, Linkedin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import DecryptedText from '@/components/DecryptedText'
 import TextPressure from '@/components/TextPressure'
@@ -9,21 +9,27 @@ import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export const FinalCall = () => {
-const { t } = useTranslation();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const contactOptions = [
     {
       label: t('email'),
-      icon: <Mail className="w-4 h-4" />, 
+      icon: <Mail className="w-4 h-4" />,
       href: 'mailto:solutionzerotrace@gmail.com',
       color: 'bg-white text-black'
     },
     {
       label: t('whatsapp'),
       icon: <MessageCircle className="w-4 h-4" />,
-      href: 'https://wa.me/201557792361',
-      color: 'glass-dark text-white border border-white/10'
+      href: 'https://wa.me/201556548385',
+      color: 'bg-green-600 text-white border border-white/10'
+    },
+    {
+      label: t('linkedin'),
+      icon: <Linkedin className="w-4 h-4" />,
+      href: '#',
+      color: 'bg-blue-600 text-white border border-white/10'
     }
   ];
 

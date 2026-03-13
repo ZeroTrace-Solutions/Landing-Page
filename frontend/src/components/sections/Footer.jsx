@@ -1,8 +1,21 @@
 import DecryptedText from '@/components/DecryptedText'
 import { useTranslation } from 'react-i18next'
+import { Github, Linkedin, Instagram, Facebook } from 'lucide-react'
+import { useLenis } from 'lenis/react'
 
 export const Footer = () => {
   const { t } = useTranslation();
+  const lenis = useLenis();
+
+  const handleNavClick = (e, target) => {
+    e.preventDefault();
+    if (lenis) {
+      lenis.scrollTo(target, {
+        offset: 0,
+        duration: 2,
+      });
+    }
+  };
 
   return (
     <footer className="pb-32 px-12 relative z-10">
@@ -14,10 +27,26 @@ export const Footer = () => {
             className="text-white/20 text-[10px] font-bold uppercase tracking-widest"
           />
         </div>
-        <div className="flex gap-16 text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
-          <a href="#" className="hover:text-white transition-colors">{t('endpoint')}</a>
-          <a href="#" className="hover:text-white transition-colors">{t('protocol')}</a>
-          <a href="#" className="hover:text-white transition-colors">{t('source')}</a>
+        <div className="flex flex-col gap-6 items-end">
+          <div className="flex gap-16 text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
+            <a href="https://github.com/ZeroTrace-Solutions" target="_blank" rel="noopener noreferrer" onClick={(e) => handleNavClick(e, 0)} className="hover:text-white transition-colors">{t('libraries')}</a>
+            <a href="#solutions" onClick={(e) => handleNavClick(e, '#solutions')} className="hover:text-white transition-colors">{t('protocol')}</a>
+            <a href="https://github.com/ZeroTrace-Solutions" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">{t('source')}</a>
+          </div>
+          <div className="flex gap-6 text-white/40">
+            <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('linkedin')}>
+              <Linkedin className="w-4 h-4" />
+            </a>
+            <a href="https://github.com/ZeroTrace-Solutions" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('github')}>
+              <Github className="w-4 h-4" />
+            </a>
+            <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('instagram')}>
+              <Instagram className="w-4 h-4" />
+            </a>
+            <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('facebook')}>
+              <Facebook className="w-4 h-4" />
+            </a>
+          </div>
         </div>
       </div>
     </footer>

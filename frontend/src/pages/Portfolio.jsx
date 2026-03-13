@@ -34,18 +34,24 @@ export const Portfolio = () => {
   ];
 
   return (
-    <div className="relative min-h-screen bg-transparent text-white selection:bg-white/20">
-      {/* reuse UniverseBackground and normal layout if desired */}
-      <div className="p-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-4 px-4 py-2 bg-white/10 hover:bg-white/20 rounded"
-        >
-          {t('back')}
-        </button>
-        <h1 className="text-3xl font-bold mb-8">{t('portfolio')}</h1>
+    <div className="relative w-screen h-screen overflow-hidden text-white selection:bg-white/20">
+      {/* Absolute Header Overlay */}
+      <div className="absolute top-0 left-0 w-full p-8 z-50 pointer-events-none">
+        <div className="max-w-7xl mx-auto flex flex-col items-start gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="pointer-events-auto px-6 py-2 bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 text-[10px] font-bold uppercase tracking-[0.4em] transition-all"
+          >
+            {t('back')}
+          </button>
+          <h1 className="text-4xl font-black uppercase tracking-tighter text-glow">
+            {t('portfolio')}
+          </h1>
+        </div>
       </div>
-      <div className="w-full h-[70vh]">
+
+      {/* Full Screen Menu */}
+      <div className="w-full h-full">
         <InfiniteMenu items={items} scale={1} />
       </div>
     </div>

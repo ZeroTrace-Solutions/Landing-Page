@@ -1,10 +1,12 @@
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { Cpu } from 'lucide-react'
+import Magnet from '@/components/Magnet'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import TextPressure from '@/components/TextPressure'
 import TextType from '@/components/TextType'
 import CardSwap, { Card } from '@/components/CardSwap'
+import { Button } from '../ui/button'
 
 export const ProtocolStack = () => {
   const navigate = useNavigate();
@@ -42,12 +44,15 @@ export const ProtocolStack = () => {
             </div>
             {/* portfolio button */}
             <div className="mt-12">
-              <button
-                onClick={() => navigate('/portfolio')}
-                className="px-6 py-3 bg-[#00ffff] text-black font-bold rounded-full hover:bg-[#00e5e5] transition-colors"
-              >
-                {t('viewPortfolio')}
-              </button>
+              <Magnet padding={50} magnetStrength={3}>
+                <Button
+                  variant="default"
+                  onClick={() => navigate('/portfolio')}
+                  className="px-6 py-3 text-black font-bold rounded-full transition-colors"
+                >
+                  {t('viewPortfolio')}
+                </Button>
+              </Magnet>
             </div>
           </ScrollReveal>
         </div>
