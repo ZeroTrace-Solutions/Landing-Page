@@ -1,17 +1,22 @@
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { Cpu } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import TextPressure from '@/components/TextPressure'
 import TextType from '@/components/TextType'
 import CardSwap, { Card } from '@/components/CardSwap'
 
 export const ProtocolStack = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
   return (
     <section id="solutions" className="py-32 px-6 relative overflow-hidden border-t border-white/5">
       <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
         <div>
           <ScrollReveal direction="left">
             <TextType
-              text="// Protocol Stack"
+              text={t('protocolStack')}
               className="text-xs font-bold text-white/30 uppercase tracking-[0.5em] mb-8 italic"
               speed={50}
             />
@@ -31,7 +36,18 @@ export const ProtocolStack = () => {
             </p>
             <div className="flex items-center gap-6">
               <div className="h-px w-12 bg-white/20" />
-              <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">Proprietary Framework v4.0</span>
+              <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
+                {t('proprietaryFramework')}
+              </span>
+            </div>
+            {/* portfolio button */}
+            <div className="mt-12">
+              <button
+                onClick={() => navigate('/portfolio')}
+                className="px-6 py-3 bg-[#00ffff] text-black font-bold rounded-full hover:bg-[#00e5e5] transition-colors"
+              >
+                {t('viewPortfolio')}
+              </button>
             </div>
           </ScrollReveal>
         </div>
@@ -51,19 +67,19 @@ export const ProtocolStack = () => {
             >
               {[
                 {
-                  title: "Architecture",
+                  titleKey: "architecture",
                   subtitle: "Structural Integrity",
                   layer: "Layer 01",
                   desc: "Mathematical models define our data structures, ensuring O(1) efficiency where it matters most. We architect for scale before the first line of code is committed."
                 },
                 {
-                  title: "Zero-Trust",
+                  titleKey: "zeroTrust",
                   subtitle: "Immutable Security",
                   layer: "Layer 02",
                   desc: "Every interaction is validated. Our security protocols aren't an afterthought; they are the foundation. Logic is isolated, immutable, and fully verifiable."
                 },
                 {
-                  title: "Autonomy",
+                  titleKey: "autonomy",
                   subtitle: "Self-Healing Edges",
                   layer: "Layer 03",
                   desc: "Digital infrastructure that manages itself through automated scaling and self-healing deployment pipelines optimized for global edge delivery and zero latency."
@@ -73,11 +89,13 @@ export const ProtocolStack = () => {
                   <div className="relative z-10">
                     <div className="flex justify-between items-start mb-12">
                       <div className="text-white/20 text-[10px] font-bold uppercase tracking-[0.4em]">
-                        {step.layer}
+                        {t('layer', { num: step.layer.split(' ')[1] })}
                       </div>
                       <Cpu className="w-5 h-5 text-white/10" />
                     </div>
-                    <h3 className="text-4xl font-black uppercase tracking-tighter mb-6">{step.title}</h3>
+                    <h3 className="text-4xl font-black uppercase tracking-tighter mb-6">
+                      {t(step.titleKey)}
+                    </h3>
                     <div className="w-16 h-1 bg-white/10 mb-8" />
                     <p className="text-white/40 leading-relaxed font-light text-sm md:text-base">
                       {step.desc}

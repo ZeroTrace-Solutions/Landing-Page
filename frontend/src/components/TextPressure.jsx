@@ -25,9 +25,9 @@ const debounce = (func, delay) => {
 
 const TextPressure = ({
   text = 'Compressa',
-  fontFamily = 'Compressa VF',
-  // This font is just an example, you should not use it in commercial projects.
-  fontUrl = 'https://res.cloudinary.com/dr6lvwubh/raw/upload/v1529908256/CompressaPRO-GX.woff2',
+  fontFamily = 'inherit',
+  // supply a URL only when you want a special font; leave blank to use global styles
+  fontUrl = '',
 
   width = true,
   weight = true,
@@ -56,7 +56,9 @@ const TextPressure = ({
   const [scaleY, setScaleY] = useState(1);
   const [lineHeight, setLineHeight] = useState(1);
 
-  const chars = text.split('');
+  // if text contains Arabic characters, don't split into individual spans
+  const isRTL = /[\u0600-\u06FF]/.test(text);
+  const chars = isRTL ? [text] : text.split('');
 
   useEffect(() => {
     const handleMouseMove = e => {
@@ -91,7 +93,8 @@ const TextPressure = ({
 
     const { width: containerW, height: containerH } = containerRef.current.getBoundingClientRect();
 
-    let newFontSize = containerW / (chars.length / 2);
+    const count = isRTL ? text.length : chars.length;
+    let newFontSize = containerW / (count / 2);
     newFontSize = Math.max(newFontSize, minFontSize);
 
     setFontSize(newFontSize);
@@ -162,6 +165,28 @@ const TextPressure = ({
   }, [width, weight, italic, alpha]);
 
   const styleElement = useMemo(() => {
+    if (!fontUrl) {
+      // no custom font needed
+      return (
+        <style>{`
+          .stroke span {
+            position: relative;
+            color: ${textColor};
+          }
+          .stroke span::after {
+            content: attr(data-char);
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: transparent;
+            z-index: -1;
+            -webkit-text-stroke-width: ${strokeWidth}px;
+            -webkit-text-stroke-color: ${strokeColor};
+          }
+        `}</style>
+      );
+    }
+
     return (
       <style>{`
           @font-face {
@@ -194,11 +219,12 @@ const TextPressure = ({
       {styleElement}
       <h1
         ref={titleRef}
+        dir={isRTL ? 'rtl' : undefined}
         className={`text-pressure-title ${className} ${
           flex ? 'flex justify-between' : ''
-        } ${stroke ? 'stroke' : ''} uppercase text-center`}
+        } ${stroke ? 'stroke' : ''} ${isRTL ? '' : 'uppercase'} text-center`}
         style={{
-          fontFamily,
+          ...(fontFamily !== 'inherit' ? { fontFamily } : {}),
           fontSize: fontSize,
           lineHeight,
           transform: `scale(1, ${scaleY})`,

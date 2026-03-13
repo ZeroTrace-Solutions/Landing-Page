@@ -6,13 +6,16 @@ import TextPressure from '@/components/TextPressure'
 import TextType from '@/components/TextType'
 import StarBorder from '@/components/StarBorder'
 import Lighthouse3D from '@/components/Lighthouse3D'
+import { useTranslation } from 'react-i18next'
 
 export const AlexandriaLab = () => {
+  const { t } = useTranslation();
+
   return (
     <section id="manifesto" className="py-64 relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <MetaBalls
-          color="rgba(255, 255, 255, 0.05)"
+          color="#00ffff"
           cursorBallColor="rgba(255, 255, 255, 0.1)"
           numBalls={15}
           size={0.6}
@@ -24,13 +27,13 @@ export const AlexandriaLab = () => {
         <div>
           <ScrollReveal direction="left">
             <TextType
-              text="// Alexandria Node"
+              text={t('alexandriaNode')}
               className="text-xs font-bold text-white/30 uppercase tracking-[0.5em] mb-8 italic"
               speed={50}
             />
             <div className="h-48 mb-12">
               <TextPressure
-                text="BORN IN EGYPT SCALED GLOBALLY"
+                text={t('bornEgypt')}
                 containerClassName="w-full h-full"
                 className="text-4xl md:text-6xl font-black uppercase leading-tight"
                 flex={true}
@@ -40,19 +43,19 @@ export const AlexandriaLab = () => {
               />
             </div>
             <p className="text-xl text-white/40 font-light leading-relaxed mb-12 max-w-lg">
-              Strategic software development rooted in the cradle of civilization, delivering future-proof architecture to the modern world.
+              {t('alexandriaParagraph')}
             </p>
             <div className="grid grid-cols-2 gap-12">
               <Magnet padding={10}>
                 <div className="p-6 border border-white/5 bg-white/[0.02] backdrop-blur-md">
                   <div className="text-4xl font-black mb-2 logo-font">2026</div>
-                  <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Inception</div>
+                  <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{t('inception')}</div>
                 </div>
               </Magnet>
               <Magnet padding={10}>
                 <div className="p-6 border border-white/5 bg-white/[0.02] backdrop-blur-md">
                   <div className="text-4xl font-black mb-2 logo-font">100%</div>
-                  <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Uptime Target</div>
+                  <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{t('uptimeTarget')}</div>
                 </div>
               </Magnet>
             </div>

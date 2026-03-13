@@ -29,7 +29,7 @@ export const Logo = ({ size = "lg", className = "" }) => {
   }, []);
 
   return (
-    <div ref={logoRef} className={`flex flex-col items-center justify-center text-white ${className}`}>
+    <div ref={logoRef} dir="ltr" className={`flex flex-col items-center justify-center text-white ${className}`}>
       {/* Official Logo.png Mark */}
       <div ref={logoMarkRef} className="relative mb-8 select-none">
         <img 

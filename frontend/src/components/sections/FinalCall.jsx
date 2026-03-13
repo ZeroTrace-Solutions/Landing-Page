@@ -5,20 +5,22 @@ import DecryptedText from '@/components/DecryptedText'
 import TextPressure from '@/components/TextPressure'
 import Magnet from '@/components/Magnet'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export const FinalCall = () => {
+const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const contactOptions = [
     {
-      label: 'Email',
-      icon: <Mail className="w-4 h-4" />,
+      label: t('email'),
+      icon: <Mail className="w-4 h-4" />, 
       href: 'mailto:solutionzerotrace@gmail.com',
       color: 'bg-white text-black'
     },
     {
-      label: 'WhatsApp',
+      label: t('whatsapp'),
       icon: <MessageCircle className="w-4 h-4" />,
       href: 'https://wa.me/201557792361',
       color: 'glass-dark text-white border border-white/10'
@@ -30,7 +32,7 @@ export const FinalCall = () => {
       <div className="max-w-4xl mx-auto">
         <ScrollReveal direction="up" distance={50} duration={1}>
           <DecryptedText
-            text="Execute Final Command"
+            text={t('executeFinalCommand')}
             animateOn="view"
             revealDirection="center"
             className="text-xs font-bold text-white/30 uppercase tracking-[0.8em] mb-12 italic"
@@ -38,9 +40,9 @@ export const FinalCall = () => {
         </ScrollReveal>
 
         <ScrollReveal direction="up" distance={100} duration={1.5} delay={200}>
-          <div className="h-48 md:h-64 w-full max-w-4xl mb-32 mx-auto">
+          <div className="h-48 md:h-64 w-full max-w-4xl  mx-auto">
             <TextPressure
-              text="LET'S BUILD."
+              text={t('letsBuild')}
               containerClassName="w-full h-full"
               className="text-6xl md:text-9xl font-black uppercase tracking-tighter"
               flex={true}
@@ -64,9 +66,9 @@ export const FinalCall = () => {
                   }`}
               >
                 {isOpen ? (
-                  <>Close Connection <X className="w-5 h-5" /></>
+                  <>{t('closeConnection')} <X className="w-5 h-5" /></>
                 ) : (
-                  <>Initiate Connection <MessageSquare className="w-5 h-5" /></>
+                  <>{t('initiateConnection')} <MessageSquare className="w-5 h-5" /></>
                 )}
               </Button>
             </Magnet>
