@@ -26,79 +26,86 @@ export const FinalCall = () => {
   ];
 
   return (
-    <section id='begin' className="py-64 flex flex-col items-center text-center px-6 border-t border-white/5 relative">
-      <ScrollReveal>
-        <DecryptedText
-          text="Execute Final Command"
-          animateOn="view"
-          revealDirection="center"
-          className="text-xs font-bold text-white/30 uppercase tracking-[0.8em] mb-12 italic"
-        />
-        <div className="h-48 md:h-64 w-full max-w-4xl mb-32 mx-auto">
-          <TextPressure
-            text="LET'S BUILD."
-            containerClassName="w-full h-full"
-            className="text-6xl md:text-9xl font-black uppercase tracking-tighter"
-            flex={true}
-            alpha={false}
-            stroke={false}
-            width={true}
-            weight={true}
-            italic={true}
-            textColor="white"
+    <section id='begin' className="py-64 flex flex-col items-center text-center px-6 border-t border-white/5 relative bg-black">
+      <div className="max-w-4xl mx-auto">
+        <ScrollReveal direction="up" distance={50} duration={1}>
+          <DecryptedText
+            text="Execute Final Command"
+            animateOn="view"
+            revealDirection="center"
+            className="text-xs font-bold text-white/30 uppercase tracking-[0.8em] mb-12 italic"
           />
-        </div>
+        </ScrollReveal>
 
-        <div className="relative flex flex-col items-center gap-8">
-          <Magnet padding={50} magnetStrength={3}>
-            <Button
-              size="xl"
-              onClick={() => setIsOpen(!isOpen)}
-              className={`rounded-none px-24 py-10 transition-all flex gap-6 mx-auto font-black uppercase tracking-widest text-xs z-20 ${isOpen ? 'bg-white/10 text-white border border-white/20' : 'bg-white text-black'
-                }`}
-            >
-              {isOpen ? (
-                <>Close Connection <X className="w-5 h-5" /></>
-              ) : (
-                <>Initiate Connection <MessageSquare className="w-5 h-5" /></>
-              )}
-            </Button>
-          </Magnet>
+        <ScrollReveal direction="up" distance={100} duration={1.5} delay={200}>
+          <div className="h-48 md:h-64 w-full max-w-4xl mb-32 mx-auto">
+            <TextPressure
+              text="LET'S BUILD."
+              containerClassName="w-full h-full"
+              className="text-6xl md:text-9xl font-black uppercase tracking-tighter"
+              flex={true}
+              alpha={false}
+              stroke={false}
+              width={true}
+              weight={true}
+              italic={true}
+              textColor="white"
+            />
+          </div>
+        </ScrollReveal>
 
-          <AnimatePresence>
-            {isOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="flex gap-4 z-10"
+        <ScrollReveal direction="up" distance={60} duration={1.2} delay={600}>
+          <div className="relative flex flex-col items-center gap-8">
+            <Magnet padding={50} magnetStrength={3}>
+              <Button
+                size="xl"
+                onClick={() => setIsOpen(!isOpen)}
+                className={`rounded-none px-24 py-10 transition-all flex gap-6 mx-auto font-black uppercase tracking-widest text-xs z-20 ${isOpen ? 'bg-white/10 text-white border border-white/20' : 'bg-white text-black'
+                  }`}
               >
-                {contactOptions.map((opt, i) => (
-                  <motion.div
-                    key={opt.label}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ delay: i * 0.1, type: "spring", stiffness: 260, damping: 20 }}
-                  >
-                    <Magnet padding={30} magnetStrength={4}>
-                      <a
-                        href={opt.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`flex items-center gap-3 px-8 py-4 text-[10px] font-bold uppercase tracking-widest shadow-2xl h-14 ${opt.color}`}
-                      >
-                        {opt.icon}
-                        {opt.label}
-                      </a>
-                    </Magnet>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </ScrollReveal>
+                {isOpen ? (
+                  <>Close Connection <X className="w-5 h-5" /></>
+                ) : (
+                  <>Initiate Connection <MessageSquare className="w-5 h-5" /></>
+                )}
+              </Button>
+            </Magnet>
+
+            <AnimatePresence>
+              {isOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="flex gap-4 z-10"
+                >
+                  {contactOptions.map((opt, i) => (
+                    <motion.div
+                      key={opt.label}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ delay: i * 0.1, type: "spring", stiffness: 260, damping: 20 }}
+                    >
+                      <Magnet padding={30} magnetStrength={4}>
+                        <a
+                          href={opt.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`flex items-center gap-3 px-8 py-4 text-[10px] font-bold uppercase tracking-widest shadow-2xl h-14 ${opt.color}`}
+                        >
+                          {opt.icon}
+                          {opt.label}
+                        </a>
+                      </Magnet>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </ScrollReveal>
+      </div>
     </section>
   )
 }
