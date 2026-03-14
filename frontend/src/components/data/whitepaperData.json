@@ -3,39 +3,13 @@
     "id": "2026-03-14",
     "date": "March 14, 2026",
     "dateAr": "١٤ مارس ٢٠٢٦",
-    "title": "Alexandria Protocol Reaches Singularity",
-    "titleAr": "بروتوكول الإسكندرية يصل إلى مرحلة التفرد",
+    "title": "Zero Trace Landing Page",
+    "titleAr": "الصفحة الرئيسية لزيرو ترايس",
     "category": "Technology",
     "categoryAr": "التكنولوجيا",
-    "excerpt": "Systemic Logic Redefines Digital Architecture; Zero-Trust Framework v4.0 Deployed.",
-    "excerptAr": "المنطق النظامي يعيد تعريف البنية التحتية الرقمية؛ نشر إطار عمل زيرو-تراست الإصدار ٤.٠.",
+    "excerpt": "The official landing page for ZT Solutions is out now!",
+    "excerptAr": "الصفحة الرئيسية لزيرو ترايس متاحة الآن!",
     "content": "In a world of volatile data and fragile infrastructure, the Zero Trace methodology emerges as the definitive standard for systemic integrity. By utilizing recursive validation layers and mathematical proofing, we have achieved a state of deterministic performance that transcends traditional software constraints.\n\nThe core of this innovation lies in our Alexandria Node, a hub of pure logic situated at the intersection of history and the future. Here, every line of code is treated as a foundational element of a larger, immutable structure.",
     "contentAr": "في عالم من البيانات المتقلبة والبنية التحتية الهشة، تبرز منهجية زيرو ترايس كمعيار نهائي للنزاهة النظامية. من خلال استخدام طبقات التحقق المتكررة والبراعة الرياضية، حققنا حالة من الأداء الحتمي الذي يتجاوز القيود البرمجية التقليدية.\n\nيكمن جوهر هذا الابتكار في عقدة الإسكندرية الخاصة بنا، وهي مركز للمنطق الصرف يقع في تقاطع التاريخ والمستقبل. هنا، يتم التعامل مع كل سطر من الأكواد كعنصر أساسي في هيكل أكبر غير قابل للتغيير."
-  },
-  {
-    "id": "2026-02-28",
-    "date": "February 28, 2026",
-    "dateAr": "٢٨ فبراير ٢٠٢٦",
-    "title": "Global Edge Resilience",
-    "titleAr": "مرونة الحواف العالمية",
-    "category": "Operations",
-    "categoryAr": "العمليات",
-    "excerpt": "Decentralization is no longer a goal; it is the reality. Our global distribution network now utilizes self-healing edges.",
-    "excerptAr": "لم تعد اللامركزية هدفاً؛ بل أصبحت واقعاً. تتبع شبكة التوزيع العالمية الخاصة بنا الآن حوافاً ذاتية الإصلاح.",
-    "content": "Our global distribution network now utilizes self-healing edges that adapt in real-time to physical and digital fluctuations. This ensure zero-trace security and zero-latency delivery for every node in the mesh.",
-    "contentAr": "تتبع شبكة التوزيع العالمية الخاصة بنا الآن حوافاً ذاتية الإصلاح تتكيف في الوقت الفعلي مع التقلبات المادية والرقمية. يضمن ذلك أمان زيرو-ترايس وتسليم البيانات بزمن وصول صفري لكل عقدة في الشبكة."
-  },
-  {
-    "id": "2026-02-15",
-    "date": "February 15, 2026",
-    "dateAr": "١٥ فبراير ٢٠٢٦",
-    "title": "Editorial: The End of Entropy",
-    "titleAr": "افتتاحية: نهاية الإنتروبيا",
-    "category": "Vision",
-    "categoryAr": "الرؤية",
-    "excerpt": "We are moving beyond the era of 'debugging' into the era of 'correctness'.",
-    "excerptAr": "نحن ننتقل من عصر 'تصحيح الأخطاء' إلى عصر 'الصحة المطلقة'.",
-    "content": "When systems are built on absolute logic, entropy is not an inevitability, but a failure of architecture.",
-    "contentAr": "عندما تُبنى الأنظمة على المنطق الصرف، فإن الإنتروبيا ليست قدراً حتمياً، بل هي فشل في المعمارية."
   }
 ]
