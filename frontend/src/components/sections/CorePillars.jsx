@@ -1,5 +1,5 @@
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
-import { Search, Shield, Zap, Infinity, ArrowUpRight, Lock } from 'lucide-react'
+import { Search, Shield, Zap, Infinity as InfinityIcon, ArrowUpRight, Lock } from 'lucide-react'
 import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
 import TextPressure from '@/components/TextPressure'
 import TextType from '@/components/TextType'
@@ -45,7 +45,7 @@ export const CorePillars = () => {
         >
           {[
             { icon: <Search className="w-8 h-8" />, titleKey: "strategicDiscovery", descKey: "descDiscovery", color: "bg-white/[0.03]" },
-            { icon: <Infinity className="w-8 h-8" />, titleKey: "totalLifecycle", descKey: "descLifecycle", color: "bg-blue-500/5" },
+            { icon: <InfinityIcon className="w-8 h-8" />, titleKey: "totalLifecycle", descKey: "descLifecycle", color: "bg-blue-500/5" },
             { icon: <Zap className="w-8 h-8" />, titleKey: "agileResponse", descKey: "descResponse", color: "bg-purple-500/5" },
             { icon: <ArrowUpRight className="w-8 h-8" />, titleKey: "elasticScaling", descKey: "descScaling", color: "bg-white/[0.03]" },
             { icon: <Lock className="w-8 h-8" />, titleKey: "zeroTraceSecurity", descKey: "descZeroTrace", color: "bg-blue-500/5" }

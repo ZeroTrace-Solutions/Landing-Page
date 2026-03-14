@@ -6,10 +6,10 @@ import TextPressure from '@/components/TextPressure'
 import Magnet from '@/components/Magnet'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion as Motion, AnimatePresence } from 'framer-motion'
 
 export const FinalCall = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const contactOptions = [
@@ -34,7 +34,7 @@ export const FinalCall = () => {
   ];
 
   return (
-    <section id='begin' className="py-32 md:py-64 flex flex-col items-center text-center px-6 border-t border-white/5 relative bg-black">
+    <section id='begin' className="py-32 md:py-64 flex flex-col items-center text-center px-6 border-t border-white/5 relative">
       <div className="max-w-4xl mx-auto">
         <ScrollReveal direction="up" distance={50} duration={1}>
           <DecryptedText
@@ -46,7 +46,7 @@ export const FinalCall = () => {
         </ScrollReveal>
 
         <ScrollReveal direction="up" distance={100} duration={1.5} delay={200}>
-          <div className={`h-48 md:h-64 w-full max-w-4xl mx-auto transform transition-transform duration-500 ${i18n.language === 'ar' ? '-translate-x-[-150px]' : ''}`}>
+          <div className="h-48 md:h-64 w-full max-w-4xl mx-auto transform transition-transform duration-500">
             <TextPressure
               text={t('letsBuild')}
               containerClassName="w-full h-full"
@@ -81,14 +81,14 @@ export const FinalCall = () => {
 
             <AnimatePresence>
               {isOpen && (
-                <motion.div
+                <Motion.div
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   className="flex flex-wrap justify-center gap-4 z-10"
                 >
                   {contactOptions.map((opt, i) => (
-                    <motion.div
+                    <Motion.div
                       key={opt.label}
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
@@ -106,9 +106,9 @@ export const FinalCall = () => {
                           {opt.label}
                         </a>
                       </Magnet>
-                    </motion.div>
+                    </Motion.div>
                   ))}
-                </motion.div>
+                </Motion.div>
               )}
             </AnimatePresence>
           </div>

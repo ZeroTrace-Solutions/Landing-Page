@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import Magnet from '@/components/Magnet'
 import GradualBlur from '@/components/GradualBlur'
+import { useNavigate } from 'react-router-dom'
 import { useLenis } from 'lenis/react'
 import { useTranslation } from 'react-i18next'
 
 export const Hero = () => {
   const { t, i18n } = useTranslation();
   const lenis = useLenis()
+  const navigate = useNavigate();
 
   const handleStart = () => {
     if (lenis) {
@@ -50,7 +52,12 @@ export const Hero = () => {
               </Button>
             </Magnet>
             <Magnet padding={20}>
-              <Button size="xl" variant="ghost" className="text-white/40 hover:text-white transition-all uppercase tracking-[0.3em] text-[10px] font-bold">
+              <Button 
+                onClick={() => navigate('/whitepaper')}
+                size="xl" 
+                variant="ghost" 
+                className="text-white/40 hover:text-white transition-all uppercase tracking-[0.3em] text-[10px] font-bold"
+              >
                 {t('readWhitepaper')} {i18n.language === 'ar' ? <ArrowLeft className="ml-4 w-4 h-4" /> : <ArrowRight className="ml-4 w-4 h-4" />}
               </Button>
             </Magnet>

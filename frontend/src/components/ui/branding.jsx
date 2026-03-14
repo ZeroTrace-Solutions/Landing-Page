@@ -1,7 +1,7 @@
 import { animate, stagger } from 'animejs';
 import { useEffect, useRef } from 'react';
 
-export const Logo = ({ size = "lg", className = "" }) => {
+export const Logo = ({ className = "" }) => {
   const logoRef = useRef(null);
   const logoMarkRef = useRef(null);
   const textRef = useRef(null);
@@ -33,7 +33,7 @@ export const Logo = ({ size = "lg", className = "" }) => {
       {/* Official Logo.png Mark */}
       <div ref={logoMarkRef} className="relative mb-5 select-none">
         <img
-          src="/logo.png"
+          src={import.meta.env.BASE_URL + "logo.png"}
           alt="ZeroTrace"
           className="w-32 sm:w-48 md:w-64 h-auto object-contain drop-shadow-[0_0_50px_rgba(255,255,255,0.4)] brightness-110"
         />

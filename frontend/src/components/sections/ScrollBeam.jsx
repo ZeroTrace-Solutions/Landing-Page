@@ -1,4 +1,4 @@
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { motion as Motion, useScroll, useSpring } from 'framer-motion';
 
 export const ScrollBeam = () => {
   const { scrollYProgress } = useScroll();
@@ -13,7 +13,7 @@ export const ScrollBeam = () => {
   return (
     <div className="absolute left-1/2 top-[110vh] -translate-x-1/2 w-px z-[5] pointer-events-none h-[calc(100%-110vh)]">
       {/* The main beam body */}
-      <motion.div
+      <Motion.div
         style={{
           scaleY: smoothProgress,
           originY: 0
@@ -33,7 +33,7 @@ export const ScrollBeam = () => {
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_20px_white]" />
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-white/20 rounded-full blur-md animate-pulse" />
         </div>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 };

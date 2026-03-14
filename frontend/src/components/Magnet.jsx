@@ -17,7 +17,9 @@ const Magnet = ({
 
   useEffect(() => {
     if (disabled) {
-      setPosition({ x: 0, y: 0 });
+      requestAnimationFrame(() => {
+        setPosition({ x: 0, y: 0 });
+      });
       return;
     }
 

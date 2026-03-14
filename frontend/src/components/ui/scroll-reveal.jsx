@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 export const ScrollReveal = ({ 
   children, 
@@ -32,7 +32,7 @@ export const ScrollReveal = ({
   };
 
   return (
-    <motion.div
+    <Motion.div
       initial="hidden"
       whileInView="visible"
       viewport={{ once: once, margin: "-10% 0px -10% 0px" }}
@@ -40,6 +40,6 @@ export const ScrollReveal = ({
       className={className}
     >
       {children}
-    </motion.div>
+    </Motion.div>
   );
 };

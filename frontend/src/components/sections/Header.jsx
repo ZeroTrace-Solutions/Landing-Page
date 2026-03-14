@@ -3,7 +3,7 @@ import { useLenis } from 'lenis/react'
 import { Library, Menu, X, LayoutGrid } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion as Motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 
 export const Header = () => {
@@ -24,7 +24,6 @@ export const Header = () => {
 
   useEffect(() => {
     const sectionIds = ['framework', 'solutions', 'begin']
-    const observers = []
 
     const observerOptions = {
       root: null,
@@ -81,7 +80,7 @@ export const Header = () => {
         </div>
 
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex gap-12 text-[10px] font-bold text-white/30 uppercase tracking-[0.5em]">
+        <nav className="hidden lg:flex gap-12 text-[10px] font-bold text-white/50 uppercase tracking-[0.5em]">
           {navLinks.map((link) => (
             <a
               key={link.id}
@@ -145,7 +144,7 @@ export const Header = () => {
       {/* Mobile Menu Backdrop - Outside the flex container to ensure full-screen cover */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -157,20 +156,20 @@ export const Header = () => {
               onClick={(e) => e.stopPropagation()}
             >
               {navLinks.map((link, i) => (
-                <motion.a
+                <Motion.a
                   key={link.id}
                   href={link.href}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.1 }}
                   onClick={(e) => handleNavClick(e, link)}
-                  className={`text-3xl font-black uppercase tracking-[0.3em] transition-all hover:tracking-[0.4em] ${activeSection === link.id ? 'text-white' : 'text-white/20'
+                  className={`text-3xl font-black uppercase tracking-[0.3em] transition-all hover:tracking-[0.4em] hover:text-white/75 ${activeSection === link.id ? 'text-white' : 'text-white/50'
                     }`}
                 >
                   {link.label}
-                </motion.a>
+                </Motion.a>
               ))}
-              <motion.div
+              <Motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: navLinks.length * 0.1 }}
@@ -185,7 +184,7 @@ export const Header = () => {
                   <Library className="w-4 h-4" />
                   {t('sourceCode')}
                 </a>
-              </motion.div>
+              </Motion.div>
             </nav>
 
             {/* Ambient Nebula decoration in the menu */}
@@ -193,7 +192,7 @@ export const Header = () => {
               <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/10 rounded-full blur-[120px]" />
               <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-[100px]" />
             </div>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </header>

@@ -1,46 +1,15 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import InfiniteMenu from '@/components/InfiniteMenu';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Move } from 'lucide-react';
+import { motion as Motion } from 'framer-motion';
+
+import portfolioData from '@/components/data/portfolioData.json';
 
 export const Portfolio = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const items = [
-    {
-      image: 'https://picsum.photos/300/300?grayscale',
-      link: 'https://google.com/',
-      title: 'Item 1',
-      titleAr: 'المشروع ١',
-      description: 'This is pretty cool, right?',
-      descriptionAr: 'هذا مذهل حقاً، أليس كذلك؟'
-    },
-    {
-      image: 'https://picsum.photos/400/400?grayscale',
-      link: 'https://google.com/',
-      title: 'Item 2',
-      titleAr: 'المشروع ٢',
-      description: 'This is pretty cool, right?',
-      descriptionAr: 'هذا مذهل حقاً، أليس كذلك؟'
-    },
-    {
-      image: 'https://picsum.photos/500/500?grayscale',
-      link: 'https://google.com/',
-      title: 'Item 3',
-      titleAr: 'المشروع ٣',
-      description: 'This is pretty cool, right?',
-      descriptionAr: 'هذا مذهل حقاً، أليس كذلك؟'
-    },
-    {
-      image: 'https://picsum.photos/600/600?grayscale',
-      link: 'https://google.com/',
-      title: 'Item 4',
-      titleAr: 'المشروع ٤',
-      description: 'This is pretty cool, right?',
-      descriptionAr: 'هذا مذهل حقاً، أليس كذلك؟'
-    }
-  ];
+  const items = portfolioData;
 
   return (
     <div className="relative w-screen h-screen overflow-hidden text-white selection:bg-white/20">
@@ -74,6 +43,23 @@ export const Portfolio = () => {
       <div className="w-full h-full">
         <InfiniteMenu items={items} scale={1} />
       </div>
+
+      {/* Navigation Hint */}
+      <Motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1, duration: 1 }}
+        className="absolute top-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 pointer-events-none z-50"
+      >
+        <div className="flex items-center gap-4 text-white/20">
+          <div className="h-px w-8 bg-white/10" />
+          <Move className="w-4 h-4 animate-pulse" />
+          <div className="h-px w-8 bg-white/10" />
+        </div>
+        <span className="text-[9px] font-bold uppercase tracking-[0.6em] text-white/30 whitespace-nowrap">
+          {t('portfolioInstruction')}
+        </span>
+      </Motion.div>
     </div>
   );
 };

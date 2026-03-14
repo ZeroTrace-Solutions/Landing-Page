@@ -283,6 +283,7 @@ const ScrollStack = ({
     window.addEventListener('resize', updateOffsets);
 
     setupLenis();
+    const lastTransforms = lastTransformsRef.current;
 
     return () => {
       window.removeEventListener('resize', updateOffsets);
@@ -295,7 +296,7 @@ const ScrollStack = ({
       stackCompletedRef.current = false;
       cardsRef.current = [];
       cardOffsetsRef.current = [];
-      lastTransformsRef.current.clear();
+      lastTransforms.clear();
       isUpdatingRef.current = false;
     };
   }, [

@@ -53,7 +53,7 @@ export const VideoIntro = ({ onComplete }) => {
         className="w-full h-full object-cover pointer-events-none"
         style={{ filter: 'contrast(1.1) brightness(1)' }}
       >
-        <source src="/intro.mp4" type="video/mp4" />
+        <source src={import.meta.env.BASE_URL + "intro.mp4"} type="video/mp4" />
       </video>
 
 

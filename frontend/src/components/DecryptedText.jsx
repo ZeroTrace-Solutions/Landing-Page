@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
-import { motion } from 'motion/react';
+import { motion as Motion } from 'motion/react';
 
 export default function DecryptedText({
   text,
@@ -340,7 +340,7 @@ export default function DecryptedText({
         : {};
 
   return (
-    <motion.span
+    <Motion.span
       ref={containerRef}
       className={`inline-block whitespace-pre-wrap ${parentClassName}`}
       {...animateProps}
@@ -357,6 +357,6 @@ export default function DecryptedText({
           );
         })}
       </span>
-    </motion.span>
+    </Motion.span>
   );
 }

@@ -69,7 +69,7 @@ const CardSwap = ({
         };
 
   const childArr = useMemo(() => Children.toArray(children), [children]);
-  const refs = useMemo(() => childArr.map(() => React.createRef()), [childArr.length]);
+  const refs = useMemo(() => childArr.map(() => React.createRef()), [childArr]);
 
   const order = useRef(Array.from({ length: childArr.length }, (_, i) => i));
 
@@ -168,7 +168,7 @@ const CardSwap = ({
       };
     }
     return () => clearInterval(intervalRef.current);
-  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing]);
+  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing, refs, config.durDrop, config.durMove, config.durReturn]);
 
   const rendered = childArr.map((child, i) =>
     isValidElement(child)
