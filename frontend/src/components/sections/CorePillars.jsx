@@ -9,7 +9,7 @@ export const CorePillars = () => {
   const { t } = useTranslation();
 
   return (
-    <section id="framework" className="pt-48 pb-0 px-6 max-w-5xl mx-auto">
+    <section id="framework" className="pt-48 pb-24 px-6 max-w-5xl mx-auto">
       <ScrollReveal direction="left" distance={80}>
         <div className="text-center mb-24 flex flex-col items-center">
           <TextType
@@ -17,18 +17,19 @@ export const CorePillars = () => {
             className="text-xs font-bold text-white/30 uppercase tracking-[0.8em] mb-4 italic"
             speed={50}
           />
-          <div className="h-32 w-full">
+          <div className="h-24 sm:h-32 w-full">
             <TextPressure
               text={t('strategicFramework')}
               containerClassName="w-full h-full"
               className="text-4xl md:text-5xl font-black uppercase"
-              flex={true}
+              flex={false}
               alpha={false}
               stroke={false}
               width={true}
               weight={true}
               italic={true}
               textColor="white"
+              minFontSize={20}
             />
           </div>
         </div>
@@ -50,17 +51,17 @@ export const CorePillars = () => {
             { icon: <ArrowUpRight className="w-8 h-8" />, titleKey: "elasticScaling", descKey: "descScaling", color: "bg-white/[0.03]" },
             { icon: <Lock className="w-8 h-8" />, titleKey: "zeroTraceSecurity", descKey: "descZeroTrace", color: "bg-blue-500/5" }
           ].map((pillar, i) => (
-            <ScrollStackItem key={i} itemClassName={`border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center p-12 overflow-hidden ${pillar.color}`}>
-              <div className="absolute top-0 right-0 p-8 text-white/5 text-8xl font-black select-none italic">
+            <ScrollStackItem key={i} itemClassName={`border border-white/10 backdrop-blur-xl flex flex-col items-center justify-center text-center p-8 sm:p-12 ${pillar.color}`}>
+              <div className="absolute top-0 right-0 p-4 sm:p-8 text-white/5 text-7xl sm:text-8xl font-black select-none italic">
                 {t('pillarIndex', { index: i + 1 })}
               </div>
-              <div className="text-white mb-8 transform group-hover:scale-110 transition-transform duration-500">
+              <div className="text-white mb-4 sm:mb-8 transform group-hover:scale-110 transition-transform duration-500">
                 {pillar.icon}
               </div>
-              <h3 className="text-2xl font-black tracking-widest uppercase mb-6">
+              <h3 className="text-xl sm:text-2xl font-black tracking-widest uppercase mb-4 sm:mb-6 px-4">
                 {t(pillar.titleKey)}
               </h3>
-              <p className="text-white/40 max-w-md leading-relaxed font-light">
+              <p className="text-white/40 max-w-md leading-relaxed font-light text-sm sm:text-base px-2">
                 {t(pillar.descKey)}
               </p>
             </ScrollStackItem>

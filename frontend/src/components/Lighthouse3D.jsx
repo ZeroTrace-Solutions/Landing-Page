@@ -66,6 +66,7 @@ export const Lighthouse3D = () => {
       <Canvas
         camera={{ position: [0, 2, 18], fov: 40 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        style={{ touchAction: 'pan-y' }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
@@ -86,6 +87,8 @@ export const Lighthouse3D = () => {
         <OrbitControls
           enableZoom={false}
           enablePan={false}
+          enableDamping={true}
+          dampingFactor={0.05}
           minPolarAngle={Math.PI / 4}
           maxPolarAngle={Math.PI / 1.5}
         />

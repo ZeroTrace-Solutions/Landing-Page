@@ -90,5 +90,7 @@
   "readFullArticle": "Read Full Article",
   "archivalSystem": "ZT // ARCHIVAL_SYSTEM",
   "dataImmutable": "All Data immutable",
-  "closeArchive": "Close Archive"
+  "closeArchive": "Close Archive",
+  "noRecords": "NO_RECORDS_FOUND_IN_VAULT",
+  "loadingArchive": "COLLECTING_ARCHIVE_DATA..."
 }

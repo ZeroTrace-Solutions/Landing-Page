@@ -33,12 +33,12 @@ export const ProtocolStack = () => {
               className="text-xs font-bold text-white/30 uppercase tracking-[0.5em] mb-8 italic"
               speed={50}
             />
-            <div className={`h-32 mb-8 transform transition-transform duration-500 ${i18n.language === 'ar' ? '-translate-x-[-150px]' : ''}`}>
+            <div className="h-24 sm:h-32 mb-8">
               <TextPressure
                 text={t('systemicLogic')}
                 containerClassName="w-full h-full"
                 className="text-4xl md:text-7xl font-black uppercase"
-                flex={true}
+                flex={false}
                 width={true}
                 weight={true}
                 textColor="white"

@@ -3,16 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import whitepaperData from '@/components/data/whitepaperData.json';
+import { getWhitepaperData } from '../services/dataService';
 
 export const Whitepaper = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
   const [selectedNews, setSelectedNews] = useState(null);
+  const [whitepaperData, setWhitepaperData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const fetchData = async () => {
+      try {
+        const data = await getWhitepaperData();
+        setWhitepaperData(data);
+      } catch (error) {
+        console.error("Failed to fetch whitepapers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   return (
@@ -52,40 +65,57 @@ export const Whitepaper = () => {
 
         {/* News Feed / Array Rendering */}
         <div className="space-y-24">
-          {whitepaperData.map((news) => (
-            <Motion.article
-              key={news.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className={`grid grid-cols-1 md:grid-cols-12 gap-10 group cursor-pointer`}
-              onClick={() => setSelectedNews(news)}
-            >
-              {/* Meta info Column */}
-              <div className="md:col-span-3 border-t md:border-t-0 md:border-l-[1px] border-black/5 pt-4 md:pt-0 md:pl-6 order-2 md:order-1">
-                <div className="text-[10px] uppercase font-sans font-black text-black/20 tracking-widest mb-2">
-                  {isRTL ? news.categoryAr : news.category}
+          {loading ? (
+            <div className="flex flex-col items-center gap-6 py-20">
+              <div className="w-12 h-12 border-t-2 border-black/10 rounded-full animate-spin" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-black/20 italic animate-pulse">
+                {t('loadingArchive')}
+              </span>
+            </div>
+          ) : whitepaperData.length > 0 ? (
+            whitepaperData.map((news) => (
+              <Motion.article
+                key={news.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className={`grid grid-cols-1 md:grid-cols-12 gap-10 group cursor-pointer`}
+                onClick={() => setSelectedNews(news)}
+              >
+                {/* Meta info Column */}
+                <div className="md:col-span-3 border-t md:border-t-0 md:border-l-[1px] border-black/5 pt-4 md:pt-0 md:pl-6 order-2 md:order-1">
+                  <div className="text-[10px] uppercase font-sans font-black text-black/20 tracking-widest mb-2">
+                    {isRTL ? news.categoryAr : news.category}
+                  </div>
+                  <div className="text-xs font-bold font-sans text-black/40">
+                    {isRTL ? news.dateAr : news.date}
+                  </div>
                 </div>
-                <div className="text-xs font-bold font-sans text-black/40">
-                  {isRTL ? news.dateAr : news.date}
-                </div>
-              </div>
 
-              {/* Content Column */}
-              <div className="md:col-span-9 order-1 md:order-2">
-                <h2 className="text-3xl md:text-5xl font-bold leading-none mb-6 group-hover:underline decoration-1 underline-offset-8 transition-all">
-                  {isRTL ? news.titleAr : news.title}
-                </h2>
-                <p className="text-lg md:text-xl text-black/60 leading-relaxed italic">
-                  {isRTL ? news.excerptAr : news.excerpt}
-                </p>
-                <div className="mt-8 flex items-center gap-2 text-[10px] font-sans font-bold uppercase tracking-widest text-black/20 group-hover:text-black transition-colors">
-                  <span>{t('readFullArticle')}</span>
-                  {isRTL ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
+                {/* Content Column */}
+                <div className="md:col-span-9 order-1 md:order-2">
+                  <h2 className="text-3xl md:text-5xl font-bold leading-none mb-6 group-hover:underline decoration-1 underline-offset-8 transition-all">
+                    {isRTL ? news.titleAr : news.title}
+                  </h2>
+                  <p className="text-lg md:text-xl text-black/60 leading-relaxed italic">
+                    {isRTL ? news.excerptAr : news.excerpt}
+                  </p>
+                  <div className="mt-8 flex items-center gap-2 text-[10px] font-sans font-bold uppercase tracking-widest text-black/20 group-hover:text-black transition-colors">
+                    <span>{t('readFullArticle')}</span>
+                    {isRTL ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
+                  </div>
                 </div>
-              </div>
-            </Motion.article>
-          ))}
+              </Motion.article>
+            ))
+          ) : (
+            <div className="py-20 flex flex-col items-center justify-center gap-4 border border-dashed border-black/10 rounded-xl animate-pulse">
+              <div className="w-8 h-px bg-black/10" />
+              <span className="italic text-black/40 uppercase tracking-[0.5em] text-[10px] font-black">
+                {t('noRecords')}
+              </span>
+              <div className="w-8 h-px bg-black/10" />
+            </div>
+          )}
         </div>
 
         {/* Footer Meta */}

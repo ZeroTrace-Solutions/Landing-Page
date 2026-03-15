@@ -43,7 +43,7 @@ const TextPressure = ({
   strokeWidth = 2,
   className = '',
 
-  minFontSize = 24
+  minFontSize = 16
 }) => {
   const containerRef = useRef(null);
   const titleRef = useRef(null);
@@ -100,9 +100,14 @@ const TextPressure = ({
     const { width: containerW, height: containerH } = containerRef.current.getBoundingClientRect();
 
     // Arabic characters are wider/taller, adjust sizing factor
+    // On mobile, we need to be even more conservative
+    const isMobile = window.innerWidth < 768;
     const count = isRTL ? text.length : chars.length;
-    const factor = isRTL ? 1.2 : 2;
+    const factor = isRTL ? (isMobile ? 0.8 : 1.0) : (isMobile ? 1.5 : 2);
     let newFontSize = containerW / (count / factor);
+    
+    // Safety cap to prevent overflow on very narrow containers
+    newFontSize = Math.min(newFontSize, containerH * 0.8);
     newFontSize = Math.max(newFontSize, minFontSize);
 
     setFontSize(newFontSize);

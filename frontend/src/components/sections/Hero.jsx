@@ -31,7 +31,7 @@ export const Hero = () => {
       </div>
 
       <div className="w-full flex flex-col items-center -mt-16 md:-mt-32 pb-32">
-        <ScrollReveal delay={400} distance={40} direction="up" duration={1.2}>
+        <ScrollReveal delay={200} distance={40} direction="up" duration={1}>
           <div className="max-w-xl mx-auto text-center mb-16 px-4">
             <GradualBlur
               text={t('heroDescription')}
@@ -40,7 +40,7 @@ export const Hero = () => {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={800} distance={60} direction="up" duration={1}>
+        <ScrollReveal delay={400} distance={60} direction="up" duration={1}>
           <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
             <Magnet padding={20} disabled={false} magnetStrength={2}>
               <Button 

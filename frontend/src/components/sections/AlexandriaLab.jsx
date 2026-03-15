@@ -31,16 +31,16 @@ export const AlexandriaLab = () => {
               className="text-xs font-bold text-white/30 uppercase tracking-[0.5em] mb-8 italic"
               speed={50}
             />
-            <div className={`h-32 md:h-48 mb-12 transform transition-transform duration-500 ${i18n.language === 'ar' ? '-translate-x-[-50px]' : ''}`}>
+            <div className="h-24 sm:h-32 md:h-48 mb-12">
               <TextPressure
                 text={t('bornEgypt')}
                 containerClassName="w-full h-full"
                 className="text-4xl md:text-6xl font-black uppercase leading-tight"
-                flex={true}
+                flex={false}
                 width={true}
                 weight={true}
                 textColor="white"
-                minFontSize={40}
+                minFontSize={20}
               />
             </div>
             <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed mb-12 max-w-lg">

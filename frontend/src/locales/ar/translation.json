@@ -85,5 +85,12 @@
   "backToCommand": "العودة إلى مركز القيادة",
   "pageNotFoundTitle": "تائه في الفضاء",
   "pageNotFoundMessage": "الإحداثيات التي قدمتها غير موجودة في هذا القطاع من الكون.",
-  "backToSafety": "العودة نحو الأمان"
+  "backToSafety": "العودة نحو الأمان",
+  "noRecords": "لم يتم العثور على سجلات",
+  "loadingArchive": "جاري جمع بيانات الأرشيف...",
+  "whitepaperVersionLabel": "إصدار عقدة الأرشيف Ver_0.4.1",
+  "readFullArticle": "اقرأ المقال كاملاً",
+  "archivalSystem": "ZT // نظام الأرشفة",
+  "dataImmutable": "جميع البيانات غير قابلة للتغيير",
+  "closeArchive": "إغلاق الأرشيف"
 }
