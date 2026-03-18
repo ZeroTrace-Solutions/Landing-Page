@@ -68,7 +68,7 @@ export const FinalCall = () => {
               <Button
                 size="xl"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`rounded-none px-12 sm:px-24 py-10 transition-all flex gap-6 mx-auto font-black uppercase tracking-widest text-xs z-20 ${isOpen ? 'bg-white/10 text-white border border-white/20' : 'bg-white text-black'
+                className={`rounded-none px-12 sm:px-24 py-10 transition-all flex gap-6 mx-auto font-black uppercase tracking-widest text-sm z-20 ${isOpen ? 'bg-white/10 text-white border border-white/20' : 'bg-white text-black'
                   }`}
               >
                 {isOpen ? (

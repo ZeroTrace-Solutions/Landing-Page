@@ -28,6 +28,21 @@ export const Whitepaper = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+
+    if (selectedNews) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+    };
+  }, [selectedNews]);
+
   return (
     <div className="relative min-h-screen bg-[#f5f5f5] text-[#1a1a1a] selection:bg-black/10 p-4 md:p-12 font-serif overflow-x-hidden">
       {/* Texture Layer */}
@@ -132,7 +147,10 @@ export const Whitepaper = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-sm p-4 md:p-12 overflow-y-auto"
+            data-lenis-prevent
+            data-lenis-prevent-wheel
+            data-lenis-prevent-touch
+            className="fixed inset-0 z-[100] h-screen bg-white/95 backdrop-blur-sm p-4 md:p-12 overflow-y-auto overscroll-contain"
           >
             <div className="max-w-3xl mx-auto relative pt-20">
               <button
@@ -152,10 +170,8 @@ export const Whitepaper = () => {
                   {isRTL ? selectedNews.titleAr : selectedNews.title}
                 </h1>
 
-                <div className={`text-xl md:text-2xl leading-relaxed text-black/70 space-y-8 ${isRTL ? 'font-arabic' : ''}`}>
-                  {(isRTL ? selectedNews.contentAr : selectedNews.content).split('\n\n').map((p, i) => (
-                    <p key={i}>{p}</p>
-                  ))}
+                <div className={`text-xl md:text-2xl leading-relaxed text-black/70 whitespace-pre-line ${isRTL ? 'font-arabic' : ''}`}>
+                  {isRTL ? selectedNews.contentAr : selectedNews.content}
                 </div>
 
                 <div className="mt-20 pt-10 border-t border-black/10 flex justify-center">

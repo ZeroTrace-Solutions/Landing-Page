@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { useLenis } from 'lenis/react'
-import { Library, Menu, X, LayoutGrid } from 'lucide-react'
+import { Library, Menu, X, LayoutGrid, Newspaper } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion as Motion } from 'framer-motion'
@@ -107,6 +107,16 @@ export const Header = () => {
             title={t('portfolio')}
           >
             <LayoutGrid className="w-5 h-5" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/whitepaper')}
+            className="p-3 cursor-pointer text-white/40 hover:text-white hover:bg-white/5 transition-all rounded-full border border-white/5"
+            title={t('readWhitepaper')}
+          >
+            <Newspaper className="w-5 h-5" />
           </Button>
 
           {/* Library Icon - Desktop Only */}

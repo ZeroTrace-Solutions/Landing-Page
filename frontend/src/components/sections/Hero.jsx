@@ -46,7 +46,7 @@ export const Hero = () => {
               <Button 
                 onClick={handleStart}
                 size="xl" 
-                className="rounded-none px-16 bg-white text-black hover:bg-white/90 transition-all font-black uppercase tracking-[0.2em] text-xs shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+                className="rounded-none px-16 bg-white text-black hover:bg-white/90 transition-all font-black uppercase tracking-[0.2em] text-sm shadow-[0_0_30px_rgba(255,255,255,0.2)]"
               >
                 {t('initializeProject')}
               </Button>
@@ -56,7 +56,7 @@ export const Hero = () => {
                 onClick={() => navigate('/whitepaper')}
                 size="xl" 
                 variant="ghost" 
-                className="text-white/40 hover:text-white transition-all uppercase tracking-[0.3em] text-[10px] font-bold"
+                className="text-white/40 hover:text-white transition-all uppercase tracking-[0.3em] text-xs font-bold"
               >
                 {t('readWhitepaper')} {i18n.language === 'ar' ? <ArrowLeft className="ml-4 w-4 h-4" /> : <ArrowRight className="ml-4 w-4 h-4" />}
               </Button>
