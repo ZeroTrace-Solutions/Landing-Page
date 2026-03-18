@@ -1013,12 +1013,19 @@ const InfiniteMenu = ({ items = [], scale = 1.0 }) => {
   }, [items, scale]);
 
   const handleButtonClick = () => {
-    if (!activeItem?.link) return;
-    if (activeItem.link.startsWith('http')) {
-      window.open(activeItem.link, '_blank');
-    } else {
-      console.log('Internal route:', activeItem.link);
+    const rawLink = activeItem?.link || activeItem?.url || activeItem?.href || activeItem?.path;
+    if (!rawLink || typeof rawLink !== 'string') return;
+
+    const link = rawLink.trim();
+    if (!link) return;
+
+    if (link.startsWith('/')) {
+      globalThis.location.assign(link);
+      return;
     }
+
+    const normalizedExternalLink = /^https?:\/\//i.test(link) ? link : `https://${link}`;
+    globalThis.open(normalizedExternalLink, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -1035,22 +1042,22 @@ const InfiniteMenu = ({ items = [], scale = 1.0 }) => {
           select-none
           absolute
           font-black
-          text-3xl sm:text-5xl md:text-7xl
-          w-full text-center ${isRTL ? 'sm:text-right' : 'sm:text-left'}
-          ${isRTL ? 'right-0 sm:right-[1.6em]' : 'left-0 sm:left-[1.6em]'}
-          top-[40%] sm:top-1/2
-          transform
-          ${isRTL ? 'sm:-translate-x-[20%]' : 'sm:translate-x-[20%]'}
-          -translate-y-1/2
+          text-3xl sm:text-5xl md:text-6xl
+          w-[min(90vw,760px)]
+          ${isRTL ? 'text-right right-4 sm:right-10' : 'text-left left-4 sm:left-10'}
+          top-26
+          leading-[0.95]
+          drop-shadow-[0_10px_28px_rgba(0,0,0,0.8)]
           transition-all
           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          text-glow px-6
+          text-glow
           ${isMoving
-                ? 'opacity-0 pointer-events-none duration-[100ms] scale-95'
-                : 'opacity-100 pointer-events-auto duration-[500ms] scale-100'
+                ? 'opacity-0 pointer-events-none duration-100 -translate-y-2 scale-[0.98]'
+                : 'opacity-100 pointer-events-auto duration-500 translate-y-0 scale-100'
               }
         `}>
             {isRTL ? (activeItem.titleAr || activeItem.title) : activeItem.title}
+            <span className={`mt-2 block h-px w-24 sm:w-36 bg-gradient-to-r ${isRTL ? 'mr-0 ml-auto from-white/70 to-transparent' : 'ml-0 mr-auto from-white/70 to-transparent'}`} />
           </h2>
 
           <p
@@ -1058,17 +1065,18 @@ const InfiniteMenu = ({ items = [], scale = 1.0 }) => {
             className={`
           select-none
           absolute
-          w-full text-center ${isRTL ? 'sm:text-right' : 'sm:text-left'}
-          max-w-none sm:max-w-[20ch]
-          text-sm sm:text-base md:text-[1.5rem]
-          bottom-[25%] sm:top-1/2
-          ${isRTL ? 'right-0 sm:right-auto sm:left-[1%]' : 'left-0 sm:left-auto sm:right-[1%]'}
+          w-[min(90vw,560px)]
+          ${isRTL ? 'text-right right-4 sm:right-10' : 'text-left left-4 sm:left-10'}
+          text-sm sm:text-base md:text-lg leading-relaxed
+          top-44 sm:top-52
+          bg-black/28 backdrop-blur-sm border border-white/10 rounded-xl
+          px-4 sm:px-5 py-2.5 sm:py-3 text-white/85
+          shadow-[0_12px_28px_rgba(0,0,0,0.45)]
           transition-all
           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
-          text-glow px-10
           ${isMoving
-                ? `opacity-0 pointer-events-none duration-[100ms] translate-y-4 ${isRTL ? 'sm:translate-x-[60%]' : 'sm:translate-x-[-60%]'} sm:-translate-y-1/2`
-                : `opacity-100 pointer-events-auto duration-[500ms] translate-y-0 ${isRTL ? 'sm:translate-x-[90%]' : 'sm:translate-x-[-90%]'} sm:-translate-y-1/2`
+                ? 'opacity-0 pointer-events-none duration-100 -translate-y-1 scale-[0.98]'
+                : 'opacity-100 pointer-events-auto duration-500 translate-y-0 scale-100'
               }
         `}>
             {isRTL ? (activeItem.descriptionAr || activeItem.description) : activeItem.description}

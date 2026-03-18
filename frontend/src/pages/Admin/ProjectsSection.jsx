@@ -285,7 +285,7 @@ export const ProjectsSection = () => {
                     <button
                       onClick={handleSaveAllCreds}
                       disabled={isBusy}
-                      className="w-full md:w-auto px-8 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 disabled:cursor-not-allowed text-white text-[11px] font-black uppercase tracking-widest rounded flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all active:scale-95 min-w-[140px] justify-center"
+                      className="w-full md:w-auto px-8 py-3 bg-white text-black hover:bg-white/90 disabled:bg-white/40 disabled:text-black/60 disabled:cursor-not-allowed text-[11px] font-black uppercase tracking-widest rounded flex items-center gap-2 shadow-lg shadow-white/10 transition-all active:scale-95 min-w-[140px] justify-center"
                     >
                       {saving ? (
                         <>

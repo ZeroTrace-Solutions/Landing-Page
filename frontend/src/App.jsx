@@ -91,9 +91,11 @@ function App() {
           <Route
             path="/admin"
             element={
-              <AdminProtection>
-                <AdminDashboard />
-              </AdminProtection>
+              <div className="admin-font">
+                <AdminProtection>
+                  <AdminDashboard />
+                </AdminProtection>
+              </div>
             }
           />
           <Route path="*" element={<NotFound />} />

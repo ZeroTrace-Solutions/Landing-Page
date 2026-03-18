@@ -42,6 +42,7 @@ const TextPressure = ({
   strokeColor = '#FF0000',
   strokeWidth = 2,
   className = '',
+  containerClassName = '',
 
   minFontSize = 16
 }) => {
@@ -117,6 +118,14 @@ const TextPressure = ({
     requestAnimationFrame(() => {
       if (!titleRef.current) return;
       const textRect = titleRef.current.getBoundingClientRect();
+
+      if (textRect.width > containerW && textRect.width > 0) {
+        const safeRatio = containerW / textRect.width;
+        const fittedSize = Math.max(minFontSize, newFontSize * safeRatio * 0.98);
+        if (fittedSize < newFontSize) {
+          setFontSize(fittedSize);
+        }
+      }
 
       if (scale && textRect.height > 0) {
         const yRatio = containerH / textRect.height;
@@ -228,7 +237,7 @@ const TextPressure = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden bg-transparent">
+      className={`relative w-full h-full overflow-visible bg-transparent ${containerClassName}`}>
       {styleElement}
       <h1
         ref={titleRef}

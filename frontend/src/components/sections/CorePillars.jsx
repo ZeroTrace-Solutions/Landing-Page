@@ -17,7 +17,7 @@ export const CorePillars = () => {
             className="text-xs font-bold text-white/30 uppercase tracking-[0.8em] mb-4 italic"
             speed={50}
           />
-          <div className="h-24 sm:h-32 w-full">
+          <div className="h-28 sm:h-40 md:h-44 w-full overflow-visible">
             <TextPressure
               text={t('strategicFramework')}
               containerClassName="w-full h-full"
@@ -25,11 +25,11 @@ export const CorePillars = () => {
               flex={false}
               alpha={false}
               stroke={false}
-              width={true}
+              width={false}
               weight={true}
               italic={true}
               textColor="white"
-              minFontSize={20}
+              minFontSize={14}
             />
           </div>
         </div>

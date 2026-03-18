@@ -66,6 +66,26 @@
 }
 
 /* local custom fonts */
+@font-face {
+  font-family: 'ZTMS';
+  src: url('./assets/fonts/en/ZTMS/SourceSerif4-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ZTMS';
+  src: url('./assets/fonts/en/ZTMS/SourceSerif4-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+.admin-font,
+.admin-font * {
+  font-family: 'ZTMS', serif !important;
+}
 
 html, body {
 

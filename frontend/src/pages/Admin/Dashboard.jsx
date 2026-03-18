@@ -84,15 +84,15 @@ export const AdminDashboard = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-12 border-b border-white/10 pb-6">
           <div>
-            <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white">ADMIN_CENTRAL</h1>
-            <p className="text-white/40 text-xs sm:text-sm font-bold uppercase tracking-[0.3em] mt-2">System Management Interface</p>
+            <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white">ZeroTrace</h1>
+            <p className="text-white/40 text-xs sm:text-sm font-bold uppercase tracking-[0.3em] mt-2">Management System</p>
           </div>
-          <button
+          {/* <button
             onClick={() => setIsMigrationDialogOpen(true)}
             className="w-full sm:w-auto px-6 py-3 border border-red-500/50 text-red-500 text-[11px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all backdrop-blur-xl"
           >
             Run Initial Migration
-          </button>
+          </button> */}
         </div>
 
         <AlertDialog open={isMigrationDialogOpen} onOpenChange={setIsMigrationDialogOpen}>

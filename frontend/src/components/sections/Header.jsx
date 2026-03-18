@@ -76,11 +76,13 @@ export const Header = () => {
       <div className={`flex justify-between items-center transition-all duration-500 ${isScrolled ? 'py-4 px-8' : 'py-8 px-8'}`}>
         <div className="flex items-center gap-4 relative z-[60]">
           <div className="w-10 h-px bg-white/20" />
-          <span className="text-xs font-bold tracking-[0.4em] uppercase text-white/40">{t('alexandria2026')}</span>
+          <span className="text-xs font-bold tracking-[0.4em] uppercase text-white/40 text-[15px]">
+            {t('alexandria2026')}
+          </span>
         </div>
 
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex gap-12 text-[10px] font-bold text-white/50 uppercase tracking-[0.5em]">
+        <nav className="hidden lg:flex gap-12 text-[15px] font-bold text-white/50 uppercase tracking-[0.5em]">
           {navLinks.map((link) => (
             <a
               key={link.id}
@@ -179,7 +181,7 @@ export const Header = () => {
                   href="https://github.com/ZeroTrace-Solutions"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 px-10 py-5 bg-white shadow-[0_0_30px_rgba(255,255,255,0.1)] rounded-full text-black text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all"
+                  className="flex items-center gap-4 px-10 py-5 bg-white shadow-[0_0_30px_rgba(255,255,255,0.1)] rounded-full text-black text-[15px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all"
                 >
                   <Library className="w-4 h-4" />
                   {t('sourceCode')}
