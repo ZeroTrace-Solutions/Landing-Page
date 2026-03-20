@@ -30,6 +30,81 @@ export const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isMigrating, setIsMigrating] = useState(false);
   const [isMigrationDialogOpen, setIsMigrationDialogOpen] = useState(false);
+  const [unsavedByTab, setUnsavedByTab] = useState({
+    portfolio: false,
+    whitepaper: false,
+    projects: false,
+  });
+
+  const hasAnyUnsavedChanges = Object.values(unsavedByTab).some(Boolean);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (!hasAnyUnsavedChanges) return;
+
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasAnyUnsavedChanges]);
+
+  useEffect(() => {
+    const handleDocumentClick = (event) => {
+      if (!hasAnyUnsavedChanges) return;
+
+      const anchor = event.target.closest('a[href]');
+      if (!anchor) return;
+      if (anchor.target && anchor.target !== '_self') return;
+
+      const rawHref = anchor.getAttribute('href') || '';
+      if (!rawHref || rawHref.startsWith('#') || rawHref.startsWith('mailto:') || rawHref.startsWith('tel:')) return;
+
+      const destination = new URL(anchor.href, window.location.href);
+      const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      const nextPath = `${destination.pathname}${destination.search}${destination.hash}`;
+
+      if (nextPath !== currentPath) {
+        event.preventDefault();
+        toast.error('UNCOMMITTED_CHANGES_BLOCKING_ROUTE');
+      }
+    };
+
+    document.addEventListener('click', handleDocumentClick, true);
+    return () => document.removeEventListener('click', handleDocumentClick, true);
+  }, [hasAnyUnsavedChanges]);
+
+  useEffect(() => {
+    if (!hasAnyUnsavedChanges) return;
+
+    const handlePopState = () => {
+      window.history.pushState(null, '', window.location.href);
+      toast.error('UNCOMMITTED_CHANGES_BLOCKING_ROUTE');
+    };
+
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handlePopState);
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [hasAnyUnsavedChanges]);
+
+  const updateTabDirtyState = (tab, hasChanges) => {
+    setUnsavedByTab((prev) => {
+      if (prev[tab] === hasChanges) return prev;
+      return { ...prev, [tab]: hasChanges };
+    });
+  };
+
+  const handleTabSwitch = (tab) => {
+    if (tab === activeTab) return;
+    if (hasAnyUnsavedChanges) {
+      toast.error('UNCOMMITTED_CHANGES_BLOCKING_TAB_SWITCH');
+      return;
+    }
+
+    setActiveTab(tab);
+  };
 
   const handleMigration = async () => {
     if (isMigrating) return;
@@ -55,6 +130,11 @@ export const AdminDashboard = () => {
         {/* Desktop Vertical Sidebar */}
         <Link
           to="/"
+          onClick={(e) => {
+            if (!hasAnyUnsavedChanges) return;
+            e.preventDefault();
+            toast.error('UNCOMMITTED_CHANGES_BLOCKING_ROUTE');
+          }}
           className="hidden md:flex fixed left-0 top-0 h-full w-14 z-50 group border-r border-white/10 bg-black/40 backdrop-blur-md -translate-x-10 hover:translate-x-0 transition-all duration-500 flex-col items-center justify-center gap-16 shadow-2xl"
         >
           <div className="flex flex-col items-center gap-8 [writing-mode:vertical-lr]">
@@ -74,6 +154,11 @@ export const AdminDashboard = () => {
         {/* Mobile Horizontal Top-Bar Button */}
         <Link
           to="/"
+          onClick={(e) => {
+            if (!hasAnyUnsavedChanges) return;
+            e.preventDefault();
+            toast.error('UNCOMMITTED_CHANGES_BLOCKING_ROUTE');
+          }}
           className="md:hidden fixed top-4 left-4 z-50 flex items-center gap-2 bg-black/60 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-full shadow-lg active:scale-95 transition-all"
         >
           <ChevronLeft size={14} className="text-white" />
@@ -146,7 +231,7 @@ export const AdminDashboard = () => {
           {['portfolio', 'whitepaper', 'projects'].map(tab => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabSwitch(tab)}
               className={`flex-grow sm:flex-grow-0 px-6 sm:px-8 py-3 text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] transition-all border backdrop-blur-xl ${activeTab === tab
                 ? 'bg-white text-black border-white'
                 : 'bg-white/5 text-white/40 border-white/10 hover:border-white/30'
@@ -158,9 +243,21 @@ export const AdminDashboard = () => {
         </div>
 
         <div className="bg-white/[0.03] border border-white/10 p-4 sm:p-8 rounded-2xl backdrop-blur-3xl shadow-2xl">
-          {activeTab === 'portfolio' && <PortfolioSection />}
-          {activeTab === 'whitepaper' && <WhitepaperSection />}
-          {activeTab === 'projects' && <ProjectsSection />}
+          {activeTab === 'portfolio' && (
+            <PortfolioSection
+              onUnsavedChangesChange={(hasChanges) => updateTabDirtyState('portfolio', hasChanges)}
+            />
+          )}
+          {activeTab === 'whitepaper' && (
+            <WhitepaperSection
+              onUnsavedChangesChange={(hasChanges) => updateTabDirtyState('whitepaper', hasChanges)}
+            />
+          )}
+          {activeTab === 'projects' && (
+            <ProjectsSection
+              onUnsavedChangesChange={(hasChanges) => updateTabDirtyState('projects', hasChanges)}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { Plus, Save, RotateCcw, Trash2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { auth } from '../../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { Link } from 'react-router-dom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +16,7 @@ import {
   AlertDialogTitle,
 } from "../../components/ui/alert-dialog";
 
-export const PortfolioSection = () => {
+export const PortfolioSection = ({ onUnsavedChangesChange = () => {} }) => {
   const [items, setItems] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
   const [deletingItem, setDeletingItem] = useState(null);
@@ -25,6 +26,14 @@ export const PortfolioSection = () => {
   const [newItem, setNewItem] = useState({ title: '', titleAr: '', description: '', descriptionAr: '', image: '', link: '' });
 
   const isBusy = loading || isDeleting || saving;
+  const hasUnsavedChanges =
+    !!editingItem ||
+    Object.values(newItem).some((value) => String(value || '').trim() !== '');
+
+  useEffect(() => {
+    onUnsavedChangesChange(hasUnsavedChanges);
+    return () => onUnsavedChangesChange(false);
+  }, [hasUnsavedChanges, onUnsavedChangesChange]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -103,7 +112,15 @@ export const PortfolioSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* List View */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-black uppercase tracking-widest border-l-4 border-white pl-4 mb-8">CURRENT_ARCHIVE</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
+              <h2 className="text-2xl font-black uppercase tracking-widest border-l-4 border-white pl-4">CURRENT_ARCHIVE</h2>
+              <Link
+                to="/portfolio"
+                className="inline-flex items-center justify-center px-4 py-2 text-[10px] font-black uppercase tracking-widest border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all"
+              >
+                View Portfolio
+              </Link>
+            </div>
             {items.map(item => (
               <div key={item.id} className="p-4 bg-white/5 border border-white/10 rounded-lg flex justify-between items-center group">
                 <div>

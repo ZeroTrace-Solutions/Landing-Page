@@ -4,6 +4,7 @@ import { Plus, Save, RotateCcw, Trash2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { auth } from '../../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { Link } from 'react-router-dom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +16,7 @@ import {
   AlertDialogTitle,
 } from "../../components/ui/alert-dialog";
 
-export const WhitepaperSection = () => {
+export const WhitepaperSection = ({ onUnsavedChangesChange = () => {} }) => {
   const [items, setItems] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
   const [deletingItem, setDeletingItem] = useState(null);
@@ -30,6 +31,14 @@ export const WhitepaperSection = () => {
   const [saving, setSaving] = useState(false);
 
   const isBusy = loading || isDeleting || saving;
+  const hasUnsavedChanges =
+    !!editingItem ||
+    Object.values(newItem).some((value) => String(value || '').trim() !== '');
+
+  useEffect(() => {
+    onUnsavedChangesChange(hasUnsavedChanges);
+    return () => onUnsavedChangesChange(false);
+  }, [hasUnsavedChanges, onUnsavedChangesChange]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -126,7 +135,15 @@ export const WhitepaperSection = () => {
           <div className="lg:col-span-1 space-y-2">
             <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/20 mb-6">NODE_DIRECTORY</h3>
             <div className="space-y-4">
-              <h2 className="text-2xl font-black uppercase tracking-widest border-l-4 border-white pl-4 mb-8">ARCHIVAL_INDEX</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
+                <h2 className="text-2xl font-black uppercase tracking-widest border-l-4 border-white pl-4">ARCHIVAL_INDEX</h2>
+                <Link
+                  to="/whitepaper"
+                  className="inline-flex items-center justify-center px-4 py-2 text-[10px] font-black uppercase tracking-widest border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all"
+                >
+                  View Whitepaper
+                </Link>
+              </div>
               {items.map(item => (
                 <div key={item.firebaseId} className="p-4 bg-white/5 border border-white/10 rounded-lg flex justify-between items-center group">
                   <div>
