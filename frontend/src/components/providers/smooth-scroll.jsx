@@ -3,13 +3,13 @@ import { ReactLenis } from 'lenis/react'
 
 export function SmoothScroll({ children }) {
     const lenisOptions = useMemo(() => ({
-        lerp: 0.08,
-        duration: 1.1,
+        lerp: 0.1, // Slightly more responsive
+        duration: 1.2,
         smoothWheel: true,
-        syncTouch: true,
+        syncTouch: false, // Use native touch scroll for better mobile feel
         syncTouchLerp: 0.08,
-        touchMultiplier: 1,
-        wheelMultiplier: 0.9,
+        touchMultiplier: 1.5,
+        wheelMultiplier: 1,
         normalizeWheel: true,
     }), [])
 

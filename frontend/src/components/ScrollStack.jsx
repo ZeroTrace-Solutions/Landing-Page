@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useCallback } from 'react';
 import Lenis from 'lenis';
+import { useLenis } from 'lenis/react';
 
 export const ScrollStackItem = ({ children, itemClassName = '' }) => (
   <div
@@ -106,7 +107,7 @@ const ScrollStack = ({
           const jCardTop = useWindowScroll
             ? containerOffsetRef.current + cardOffsetsRef.current[j]
             : cardOffsetsRef.current[j];
-            
+
           const jTriggerStart = jCardTop - stackPositionPx - itemStackDistance * j;
           if (scrollTop >= jTriggerStart) {
             topCardIndex = j;
@@ -184,30 +185,14 @@ const ScrollStack = ({
     updateCardTransforms();
   }, [updateCardTransforms]);
 
+  // Use the global Lenis instance for window scroll
+  useLenis(useWindowScroll ? handleScroll : null);
+
   const setupLenis = useCallback(() => {
     if (useWindowScroll) {
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-        touchMultiplier: 2,
-        infinite: false,
-        wheelMultiplier: 1,
-        lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075
-      });
-
-      lenis.on('scroll', handleScroll);
-
-      const raf = time => {
-        lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
-      };
-      animationFrameRef.current = requestAnimationFrame(raf);
-
-      lenisRef.current = lenis;
-      return lenis;
+      // Don't create a new Lenis instance for window scroll
+      // The global instance is already handled by useLenis hook
+      return null;
     } else {
       const scroller = scrollerRef.current;
       if (!scroller) return;
@@ -218,11 +203,11 @@ const ScrollStack = ({
         duration: 1.2,
         easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
-        touchMultiplier: 2,
+        touchMultiplier: 1.5, // Reduced multiplier for native-like feel
         infinite: false,
         wheelMultiplier: 1,
         lerp: 0.1,
-        syncTouch: true,
+        syncTouch: false, // Use native touch scroll
         syncTouchLerp: 0.075
       });
 
@@ -318,21 +303,21 @@ const ScrollStack = ({
   // Container styles based on scroll mode
   const containerStyles = useWindowScroll
     ? {
-        // Global scroll mode - no overflow constraints
-        overscrollBehavior: 'contain',
-        WebkitOverflowScrolling: 'touch',
-        WebkitTransform: 'translateZ(0)',
-        transform: 'translateZ(0)'
-      }
+      // Global scroll mode - no overflow constraints
+      overscrollBehavior: 'contain',
+      WebkitOverflowScrolling: 'touch',
+      WebkitTransform: 'translateZ(0)',
+      transform: 'translateZ(0)'
+    }
     : {
-        // Container scroll mode - original behavior
-        overscrollBehavior: 'contain',
-        WebkitOverflowScrolling: 'touch',
-        scrollBehavior: 'smooth',
-        WebkitTransform: 'translateZ(0)',
-        transform: 'translateZ(0)',
-        willChange: 'scroll-position'
-      };
+      // Container scroll mode - original behavior
+      overscrollBehavior: 'contain',
+      WebkitOverflowScrolling: 'touch',
+      scrollBehavior: 'smooth',
+      WebkitTransform: 'translateZ(0)',
+      transform: 'translateZ(0)',
+      willChange: 'scroll-position'
+    };
 
   const containerClassName = useWindowScroll
     ? `relative w-full ${className}`.trim()

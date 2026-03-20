@@ -39,10 +39,10 @@ export const CorePillars = () => {
         <ScrollStack
           useWindowScroll={true}
           className="max-w-4xl mx-auto"
-          itemDistance={80}
-          baseScale={0.9}
-          rotationAmount={2}
-          blurAmount={10}
+          itemDistance={40}
+          baseScale={0.99}
+          rotationAmount={1}
+          blurAmount={20}
         >
           {[
             { icon: <Search className="w-8 h-8" />, titleKey: "strategicDiscovery", descKey: "descDiscovery", color: "bg-white/[0.03]" },
