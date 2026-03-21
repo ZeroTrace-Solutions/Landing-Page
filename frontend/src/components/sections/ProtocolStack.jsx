@@ -2,8 +2,8 @@ import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { Cpu } from 'lucide-react'
 import Magnet from '@/components/Magnet'
 import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import TextPressure from '@/components/TextPressure'
 import TextType from '@/components/TextType'
 import CardSwap, { Card } from '@/components/CardSwap'
@@ -11,7 +11,7 @@ import { Button } from '../ui/button'
 
 export const ProtocolStack = () => {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   useEffect(() => {
@@ -23,19 +23,43 @@ export const ProtocolStack = () => {
   const isMobile = windowWidth < 768;
   const isSmallMobile = windowWidth < 480;
 
+  const projects = [
+    {
+      name: t('saasProjectBayanName'),
+      type: t('saasProjectBayanType'),
+      subtitle: t('saasProjectBayanSubtitle'),
+      description: t('saasProjectBayanDescription'),
+      status: t('saasProjectBayanStatus')
+    },
+    {
+      name: t('saasProjectTayfName'),
+      type: t('saasProjectTayfType'),
+      subtitle: t('saasProjectTayfSubtitle'),
+      description: t('saasProjectTayfDescription'),
+      status: t('saasProjectTayfStatus')
+    },
+    {
+      name: t('saasProjectSOStudyName'),
+      type: t('saasProjectSOStudyType'),
+      subtitle: t('saasProjectSOStudySubtitle'),
+      description: t('saasProjectSOStudyDescription'),
+      status: t('saasProjectSOStudyStatus')
+    }
+  ];
+
   return (
     <section id="solutions" className="py-32 px-6 relative overflow-hidden border-t border-white/5">
       <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
         <div>
           <ScrollReveal direction="left">
             <TextType
-              text={t('protocolStack')}
+              text={t('saasProjectsLabel')}
               className="text-xs font-bold text-white/30 uppercase tracking-[0.5em] mb-8 italic"
               speed={50}
             />
             <div className="h-28 sm:h-40 md:h-48 mb-8 overflow-visible">
               <TextPressure
-                text={t('systemicLogic')}
+                text={t('saasProjectsTitle')}
                 containerClassName="w-full h-full"
                 className="text-4xl md:text-7xl font-black uppercase"
                 flex={false}
@@ -46,15 +70,14 @@ export const ProtocolStack = () => {
               />
             </div>
             <p className="text-lg text-white/40 font-light leading-relaxed max-w-md mb-12">
-              {t('protocolDescription')}
+              {t('saasProjectsDescription')}
             </p>
             <div className="flex items-center gap-6">
               <div className="h-px w-12 bg-white/20" />
               <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
-                {t('proprietaryFramework')}
+                {t('saasProjectsTagline')}
               </span>
             </div>
-            {/* portfolio button */}
             <div className="mt-12">
               <Magnet padding={50} magnetStrength={3}>
                 <Button
@@ -82,50 +105,31 @@ export const ProtocolStack = () => {
               pauseOnHover={true}
               easing="power"
             >
-              {[
-                {
-                  titleKey: "architecture",
-                  subtitleKey: "structuralIntegrity",
-                  layer: "Layer 01",
-                  descKey: "descArch"
-                },
-                {
-                  titleKey: "zeroTrust",
-                  subtitleKey: "immutableSecurity",
-                  layer: "Layer 02",
-                  descKey: "descZeroTrust"
-                },
-                {
-                  titleKey: "autonomy",
-                  subtitleKey: "selfHealingEdges",
-                  layer: "Layer 03",
-                  descKey: "descAutonomy"
-                }
-              ].map((step, i) => (
+              {projects.map((project, i) => (
                 <Card key={i} className="border-white/10 bg-white/[0.02] backdrop-blur-2xl p-6 sm:p-10 flex flex-col justify-between hover:border-white/20 transition-all duration-500 rounded-2xl">
                   <div className="relative z-10">
                     <div className="flex justify-between items-start mb-12">
                       <div className="text-white/20 text-[10px] font-bold uppercase tracking-[0.4em]">
-                        {t('layer', { num: step.layer.split(' ')[1] })}
+                        {project.type}
                       </div>
                       <Cpu className="w-5 h-5 text-white/10" />
                     </div>
                     <h3 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter mb-6">
-                      {t(step.titleKey)}
+                      {project.name}
                     </h3>
                     <div className="w-16 h-1 bg-white/10 mb-8" />
                     <p className="text-white/40 leading-relaxed font-light text-sm md:text-base">
-                      {t(step.descKey)}
+                      {project.description}
                     </p>
                   </div>
 
                   <div className="relative z-10 flex flex-col gap-4">
                     <div className="flex items-center gap-3 text-[10px] font-bold text-white/30 uppercase tracking-widest">
                       <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
-                      {t(step.subtitleKey)}
+                      {project.subtitle}
                     </div>
                     <div className="text-[9px] text-white/10 font-mono">
-                      {t('execStatus')}
+                      {project.status}
                     </div>
                   </div>
 

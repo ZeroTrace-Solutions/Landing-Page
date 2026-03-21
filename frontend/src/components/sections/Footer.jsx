@@ -30,16 +30,16 @@ export const Footer = () => {
             <a href="https://github.com/ZeroTrace-Solutions" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">{t('source')}</a>
           </div>
           <div className="flex gap-6 text-white/40">
-            <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('linkedin')}>
+            {/* <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('linkedin')}>
               <Linkedin className="w-4 h-4" />
-            </a>
+            </a> */}
             <a href="https://github.com/ZeroTrace-Solutions" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('github')}>
               <Github className="w-4 h-4" />
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('instagram')}>
+            <a href="https://www.instagram.com/zt.solutions?igsh=MW16bmFkbm0yM21sdA==" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('instagram')}>
               <Instagram className="w-4 h-4" />
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('facebook')}>
+            <a href="https://www.facebook.com/share/18Cfgup4mS/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('facebook')}>
               <Facebook className="w-4 h-4" />
             </a>
           </div>

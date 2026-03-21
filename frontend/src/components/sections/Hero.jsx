@@ -25,13 +25,13 @@ export const Hero = () => {
   return (
     <section className="relative min-h-[120vh] flex flex-col items-center px-6">
       <div className="h-screen flex flex-col items-center justify-center">
-        <ScrollReveal distance={100} duration={1.5}>
+        <ScrollReveal distance={50} duration={1.5}>
           <Logo className="transform hover:scale-[1.05] transition-transform duration-1000" />
         </ScrollReveal>
       </div>
 
       <div className="w-full flex flex-col items-center -mt-16 md:-mt-32 pb-32">
-        <ScrollReveal delay={200} distance={40} direction="up" duration={1}>
+        <ScrollReveal delay={50} distance={40} direction="up" duration={1}>
           <div className="max-w-xl mx-auto text-center mb-16 px-4">
             <GradualBlur
               text={t('heroDescription')}
@@ -40,7 +40,7 @@ export const Hero = () => {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={400} distance={60} direction="up" duration={1}>
+        <ScrollReveal delay={30} distance={60} direction="up" duration={1}>
           <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
             <Magnet padding={20} disabled={false} magnetStrength={2}>
               <Button 
@@ -65,7 +65,7 @@ export const Hero = () => {
         </ScrollReveal>
       </div>
 
-      <ScrollReveal delay={1200} direction="down" distance={20}>
+      <ScrollReveal delay={500} direction="down" distance={20}>
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 opacity-20 hover:opacity-100 transition-opacity">
           <span className="text-[8px] font-bold uppercase tracking-[1em] -mr-[1em]">{t('scroll')}</span>
         </div>
