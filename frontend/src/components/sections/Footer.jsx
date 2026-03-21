@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Github, Linkedin, Instagram, Facebook } from 'lucide-react'
+import { Github, Linkedin, Instagram, Facebook, Youtube } from 'lucide-react'
 import { useLenis } from 'lenis/react'
 
 export const Footer = () => {
@@ -41,6 +41,9 @@ export const Footer = () => {
             </a>
             <a href="https://www.facebook.com/share/18Cfgup4mS/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('facebook')}>
               <Facebook className="w-4 h-4" />
+            </a>
+            <a href="https://www.youtube.com/@ZeroTraceSolutions2026" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('youtube')}>
+              <Youtube className="w-4 h-4" />
             </a>
           </div>
         </div>
