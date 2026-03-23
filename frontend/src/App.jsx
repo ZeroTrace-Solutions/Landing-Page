@@ -20,10 +20,15 @@ function App() {
   const [showContent, setShowContent] = useState(() => {
     return sessionStorage.getItem('introPlayed') === 'true';
   });
+  const [isMobileView, setIsMobileView] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 767px)').matches;
+  });
   const location = useLocation();
 
   const isHome = location.pathname === '/';
   const showCursor = location.pathname !== '/whitepaper';
+  const shouldShowIntro = isHome && !showContent && !isMobileView;
 
   const handleIntroComplete = () => {
     sessionStorage.setItem('introPlayed', 'true');
@@ -37,6 +42,20 @@ function App() {
     document.documentElement.dir = (lang === 'ar' && !isAdmin) ? 'rtl' : 'ltr';
     document.body.classList.toggle('font-arabic', lang === 'ar' && !isAdmin);
   }, [i18nObj.language, location.pathname]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const onChange = (event) => setIsMobileView(event.matches);
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', onChange);
+      return () => mediaQuery.removeEventListener('change', onChange);
+    }
+
+    mediaQuery.addListener(onChange);
+    return () => mediaQuery.removeListener(onChange);
+  }, []);
 
   return (
     <div className="relative min-h-screen bg-transparent text-white selection:bg-white/20 font-sans">
@@ -54,13 +73,13 @@ function App() {
 
       {!location.pathname.startsWith('/admin') && <LanguageToggle />}
 
-      {isHome && !showContent && <VideoIntro onComplete={handleIntroComplete} />}
+      {shouldShowIntro && <VideoIntro onComplete={handleIntroComplete} />}
 
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route
             path="/"
-            element={(showContent || !isHome) ? <Main /> : <div />}
+            element={!shouldShowIntro ? <Main /> : <div />}
           />
           <Route
             path="/portfolio"

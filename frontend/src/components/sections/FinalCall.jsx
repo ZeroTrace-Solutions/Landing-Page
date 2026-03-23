@@ -1,5 +1,5 @@
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
-import { MessageSquare, Mail, X, MessageCircle, Linkedin } from 'lucide-react'
+import { MessageSquare, Mail, X, MessageCircle, Instagram } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import DecryptedText from '@/components/DecryptedText'
 import TextPressure from '@/components/TextPressure'
@@ -26,10 +26,10 @@ export const FinalCall = () => {
       color: 'bg-green-600 text-white border border-white/10'
     },
     {
-      label: t('linkedin'),
-      icon: <Linkedin className="w-4 h-4" />,
-      href: '#',
-      color: 'bg-blue-600 text-white border border-white/10'
+      label: t('instagram'),
+      icon: <Instagram className="w-4 h-4" />,
+      href: 'https://www.instagram.com/zt.solutions?igsh=MW16bmFkbm0yM21sdA==',
+      color: 'bg-pink-600 text-white border border-white/10'
     }
   ];
 
@@ -45,7 +45,7 @@ export const FinalCall = () => {
           />
         </ScrollReveal>
 
-        <ScrollReveal direction="up" distance={100} duration={1.5} delay={200}>
+        <ScrollReveal direction="up" distance={50} duration={1.5} delay={200}>
           <div className="h-48 md:h-64 w-full max-w-4xl mx-auto transform transition-transform duration-500">
             <TextPressure
               text={t('letsBuild')}
@@ -62,7 +62,7 @@ export const FinalCall = () => {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal direction="up" distance={60} duration={1.2} delay={600}>
+        <ScrollReveal direction="up" distance={60} duration={1.2} delay={50}>
           <div className="relative flex flex-col items-center gap-8">
             <Magnet padding={50} magnetStrength={3}>
               <Button
