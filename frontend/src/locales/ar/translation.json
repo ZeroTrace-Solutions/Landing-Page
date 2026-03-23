@@ -92,5 +92,9 @@
   "readFullArticle": "اقرأ المقال كاملاً",
   "archivalSystem": "ZT // نظام الأرشفة",
   "dataImmutable": "جميع البيانات غير قابلة للتغيير",
-  "closeArchive": "إغلاق الأرشيف"
+  "closeArchive": "إغلاق الأرشيف",
+  "searchArticlesPlaceholder": "ابحث بالعنوان أو الملخص أو المحتوى",
+  "filterByDate": "تصفية حسب التاريخ",
+  "clearFilters": "مسح",
+  "noFilteredRecords": "لا توجد مقالات مطابقة"
 }

@@ -91,6 +91,10 @@
   "archivalSystem": "ZT // ARCHIVAL_SYSTEM",
   "dataImmutable": "All Data immutable",
   "closeArchive": "Close Archive",
+  "searchArticlesPlaceholder": "Search by title, excerpt, or content",
+  "filterByDate": "Filter by date",
+  "clearFilters": "Clear",
+  "noFilteredRecords": "NO_MATCHING_ARTICLES",
   "noRecords": "NO_RECORDS_FOUND_IN_VAULT",
   "loadingArchive": "COLLECTING_ARCHIVE_DATA..."
 }

@@ -2,8 +2,109 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import { getWhitepaperData } from '../services/dataService';
+import { Button } from '../components/ui/button';
+import { Calendar } from '../components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
+
+const LINK_PATTERN = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+
+const renderLineWithLinks = (line, lineIndex) => {
+  const nodes = [];
+  let lastIndex = 0;
+  let match;
+
+  LINK_PATTERN.lastIndex = 0;
+
+  while ((match = LINK_PATTERN.exec(line)) !== null) {
+    const [fullMatch, label, url] = match;
+    const start = match.index;
+
+    if (start > lastIndex) {
+      nodes.push(
+        <React.Fragment key={`text-${lineIndex}-${lastIndex}`}>
+          {line.slice(lastIndex, start)}
+        </React.Fragment>
+      );
+    }
+
+    nodes.push(
+      <a
+        key={`link-${lineIndex}-${start}`}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mx-1 inline-flex items-center rounded-md border border-black/10 bg-black/5 px-2 py-1 text-base font-semibold not-italic text-black no-underline transition-colors hover:border-black/20 hover:bg-black/10 md:text-lg"
+      >
+        {label}
+      </a>
+    );
+
+    lastIndex = start + fullMatch.length;
+  }
+
+  if (lastIndex < line.length) {
+    nodes.push(
+      <React.Fragment key={`tail-${lineIndex}-${lastIndex}`}>
+        {line.slice(lastIndex)}
+      </React.Fragment>
+    );
+  }
+
+  return nodes;
+};
+
+const renderContentWithTaggedLinks = (content) => {
+  if (!content) return null;
+
+  const lines = content.split('\n');
+  const result = [];
+  let lineOffset = 0;
+
+  for (const line of lines) {
+    const key = `line-${lineOffset}-${line.length}`;
+    result.push(
+      <React.Fragment key={key}>
+        {renderLineWithLinks(line, lineOffset)}
+      </React.Fragment>
+    );
+
+    lineOffset += line.length;
+
+    if (lineOffset < content.length) {
+      result.push(<br key={`br-${lineOffset}`} />);
+    }
+
+    lineOffset += 1;
+  }
+
+  return result;
+};
+
+const parseArticleDate = (article) => {
+  if (article?.id && /^\d{4}-\d{2}-\d{2}$/.test(article.id)) {
+    const parsed = new Date(`${article.id}T00:00:00`);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+
+  if (article?.date) {
+    const parsed = new Date(article.date);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+
+  return null;
+};
+
+const isSameDay = (dateA, dateB) => {
+  if (!dateA || !dateB) return false;
+
+  return (
+    dateA.getFullYear() === dateB.getFullYear() &&
+    dateA.getMonth() === dateB.getMonth() &&
+    dateA.getDate() === dateB.getDate()
+  );
+};
 
 export const Whitepaper = () => {
   const { t, i18n } = useTranslation();
@@ -12,6 +113,8 @@ export const Whitepaper = () => {
   const [selectedNews, setSelectedNews] = useState(null);
   const [whitepaperData, setWhitepaperData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState(undefined);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -42,6 +145,34 @@ export const Whitepaper = () => {
       document.documentElement.style.overflow = originalHtmlOverflow;
     };
   }, [selectedNews]);
+
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+
+  const filteredWhitepaperData = whitepaperData.filter((news) => {
+    const title = isRTL ? news.titleAr : news.title;
+    const excerpt = isRTL ? news.excerptAr : news.excerpt;
+    const content = isRTL ? news.contentAr : news.content;
+
+    const matchesText =
+      !normalizedSearchQuery ||
+      [title, excerpt, content]
+        .filter(Boolean)
+        .some((field) => field.toLowerCase().includes(normalizedSearchQuery));
+
+    const matchesDate = !selectedDate || isSameDay(parseArticleDate(news), selectedDate);
+
+    return matchesText && matchesDate;
+  });
+
+  const formattedSelectedDate = selectedDate
+    ? new Intl.DateTimeFormat(isRTL ? 'ar-EG' : 'en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(selectedDate)
+    : t('filterByDate');
+
+  const hasActiveFilters = Boolean(normalizedSearchQuery || selectedDate);
 
   return (
     <div className="relative min-h-screen bg-[#f5f5f5] text-[#1a1a1a] selection:bg-black/10 p-4 md:p-12 font-serif overflow-x-hidden">
@@ -76,6 +207,56 @@ export const Whitepaper = () => {
             <span className="text-[10px] tracking-[0.8em] text-black/20 font-sans uppercase">{t('whitepaperVersionLabel')}</span>
             <div className="h-px bg-black/10 flex-grow max-w-[100px]" />
           </div>
+
+          <div className={`mt-10 grid grid-cols-1 md:grid-cols-12 gap-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className="md:col-span-6 relative">
+              <Search size={16} className={`absolute top-1/2 -translate-y-1/2 text-black/40 ${isRTL ? 'right-3' : 'left-3'}`} />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={t('searchArticlesPlaceholder')}
+                className={`w-full h-10 rounded-md border border-black/10 bg-white px-10 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/10 ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
+              />
+            </div>
+
+            <div className="md:col-span-4">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full h-10 justify-start border-black/10 bg-white text-black hover:bg-black/5 hover:text-black"
+                  >
+                    <CalendarIcon size={16} />
+                    <span className="truncate">{formattedSelectedDate}</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align={isRTL ? 'end' : 'start'}>
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="md:col-span-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedDate(undefined);
+                }}
+                disabled={!hasActiveFilters}
+                className="w-full h-10 hover:text-black border-black/10 bg-white text-black hover:bg-black/5"
+              >
+                {t('clearFilters')}
+              </Button>
+            </div>
+          </div>
         </header>
 
         {/* News Feed / Array Rendering */}
@@ -87,8 +268,8 @@ export const Whitepaper = () => {
                 {t('loadingArchive')}
               </span>
             </div>
-          ) : whitepaperData.length > 0 ? (
-            whitepaperData.map((news) => (
+          ) : filteredWhitepaperData.length > 0 ? (
+            filteredWhitepaperData.map((news) => (
               <Motion.article
                 key={news.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -126,7 +307,7 @@ export const Whitepaper = () => {
             <div className="py-20 flex flex-col items-center justify-center gap-4 border border-dashed border-black/10 rounded-xl animate-pulse">
               <div className="w-8 h-px bg-black/10" />
               <span className="italic text-black/40 uppercase tracking-[0.5em] text-[10px] font-black">
-                {t('noRecords')}
+                {hasActiveFilters ? t('noFilteredRecords') : t('noRecords')}
               </span>
               <div className="w-8 h-px bg-black/10" />
             </div>
@@ -170,8 +351,8 @@ export const Whitepaper = () => {
                   {isRTL ? selectedNews.titleAr : selectedNews.title}
                 </h1>
 
-                <div className={`text-xl md:text-2xl leading-relaxed text-black/70 whitespace-pre-line ${isRTL ? 'font-arabic' : ''}`}>
-                  {isRTL ? selectedNews.contentAr : selectedNews.content}
+                <div className={`text-xl md:text-2xl leading-relaxed text-black/70 ${isRTL ? 'font-arabic' : ''}`}>
+                  {renderContentWithTaggedLinks(isRTL ? selectedNews.contentAr : selectedNews.content)}
                 </div>
 
                 <div className="mt-20 pt-10 border-t border-black/10 flex justify-center">
