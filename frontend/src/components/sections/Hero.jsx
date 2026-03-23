@@ -12,6 +12,7 @@ export const Hero = () => {
   const { t, i18n } = useTranslation();
   const lenis = useLenis()
   const navigate = useNavigate();
+  const publicPackagesUrl = 'https://github.com/orgs/ZeroTrace-Solutions/repositories?q=visibility%3Apublic+archived%3Afalse'
 
   const handleStart = () => {
     if (lenis) {
@@ -41,7 +42,8 @@ export const Hero = () => {
         </ScrollReveal>
 
         <ScrollReveal delay={30} distance={60} direction="up" duration={1}>
-          <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
+          <div className="flex flex-col gap-8 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-8 justify-center items-center">
             <Magnet padding={20} disabled={false} magnetStrength={2}>
               <Button 
                 onClick={handleStart}
@@ -61,6 +63,21 @@ export const Hero = () => {
                 {t('readWhitepaper')} {i18n.language === 'ar' ? <ArrowLeft className="ml-4 w-4 h-4" /> : <ArrowRight className="ml-4 w-4 h-4" />}
               </Button>
             </Magnet>
+            </div>
+            <div className="hidden sm:block">
+              <Magnet padding={20}>
+                <Button
+                  asChild
+                  size="xl"
+                  variant="ghost"
+                  className="text-white/40 hover:text-white transition-all uppercase tracking-[0.3em] text-xs font-bold"
+                >
+                  <a href={publicPackagesUrl} target="_blank" rel="noopener noreferrer">
+                    {t('publicPackages')} {i18n.language === 'ar' ? <ArrowLeft className="ml-4 w-4 h-4" /> : <ArrowRight className="ml-4 w-4 h-4" />}
+                  </a>
+                </Button>
+              </Magnet>
+            </div>
           </div>
         </ScrollReveal>
       </div>

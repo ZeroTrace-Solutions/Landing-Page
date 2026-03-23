@@ -1,5 +1,5 @@
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
-import { Cpu } from 'lucide-react'
+import { ArrowUpLeft, ArrowUpRight, Cpu } from 'lucide-react'
 import Magnet from '@/components/Magnet'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
@@ -11,7 +11,8 @@ import { Button } from '../ui/button'
 
 export const ProtocolStack = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const publicPackagesUrl = 'https://github.com/orgs/ZeroTrace-Solutions/repositories?q=visibility%3Apublic+archived%3Afalse';
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   useEffect(() => {
@@ -69,16 +70,19 @@ export const ProtocolStack = () => {
                 minFontSize={14}
               />
             </div>
-            <p className="text-lg text-white/40 font-light leading-relaxed max-w-md mb-12">
+            <p className="text-lg text-white/40 font-light leading-relaxed max-w-md mb-12 break-words [overflow-wrap:anywhere]">
               {t('saasProjectsDescription')}
             </p>
             <div className="flex items-center gap-6">
               <div className="h-px w-12 bg-white/20" />
-              <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
+              <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.4em] break-words [overflow-wrap:anywhere]">
                 {t('saasProjectsTagline')}
               </span>
             </div>
-            <div className="mt-12">
+            <p className="mt-8 text-sm md:text-base text-white/35 max-w-md leading-relaxed break-words [overflow-wrap:anywhere]">
+              {t('publicPackagesNote')}
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
               <Magnet padding={50} magnetStrength={3}>
                 <Button
                   variant="default"
@@ -86,6 +90,18 @@ export const ProtocolStack = () => {
                   className="px-6 py-3 text-black font-bold rounded-full transition-colors"
                 >
                   {t('viewPortfolio')}
+                </Button>
+              </Magnet>
+              <Magnet padding={40} magnetStrength={2}>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="px-6 py-3 rounded-full border border-white/20 text-white/80 hover:text-white hover:border-white/40"
+                >
+                  <a href={publicPackagesUrl} target="_blank" rel="noopener noreferrer">
+                    {t('explorePublicPackages')}
+                    {i18n.language === "ar" ? <ArrowUpLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+                  </a>
                 </Button>
               </Magnet>
             </div>
