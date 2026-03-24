@@ -14,7 +14,6 @@ import { AdminDashboard } from '@/pages/Admin/Dashboard'
 import { Toaster, toast } from 'sonner'
 import { auth } from '@/lib/firebase'
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth'
-import { ComplaintWidget } from './components/ui/complaint-widget'
 
 function App() {
   const { i18n: i18nObj } = useTranslation();
@@ -61,21 +60,7 @@ function App() {
   return (
     <div className="relative min-h-screen bg-transparent text-white selection:bg-white/20 font-sans">
       <UniverseBackground />
-      <ComplaintWidget 
-        whatsappUrl="https://wa.me/201557792361"
-        apiEndpoint="/api/complaints"
-        i18n={i18nObj}
-        zIndex={9999999}
-        colors={{
-          primary: "green",
-          surface: "brown",
-          text: "hsl(green)",
-          border: "hsl(var(--border))"
-        }}
-        direction="ltr"
-        side="left"
-
-      />
+    
       {showCursor && (
         <SplashCursor
           SPLAT_RADIUS={0.08}
