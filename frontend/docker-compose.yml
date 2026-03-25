@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+
+  landing:
+
+    build: .
+
+    container_name: landing_page
+
+    restart: always
+
+    ports:
+
+      - "80:80"
