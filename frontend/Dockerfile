@@ -8,7 +8,8 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+# Change your existing build step to this:
+RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build
 
 FROM nginx:alpine
 
