@@ -26,10 +26,10 @@ class Star {
     const y1 = p1.y + r1.oy;
     const x2 = p2.x + r2.ox;
     const y2 = p2.y + r2.oy;
-    const alpha = Math.min(1, (1 - this.z / 2000) * 2.5);
+    const alpha = Math.max(0, Math.min(1, (1 - this.z / 2000) * 2.5));
     ctx.beginPath();
     ctx.strokeStyle = this.isSuper ? `rgba(180, 220, 255, ${alpha})` : `rgba(255, 255, 255, ${alpha})`;
-    ctx.lineWidth = this.thickness * (p1.size / 8);
+    ctx.lineWidth = Math.max(0.1, this.thickness * (p1.size / 8));
     ctx.lineCap = 'round';
     ctx.moveTo(x2, y2);
     ctx.lineTo(x1, y1);
@@ -50,11 +50,12 @@ class Cloud {
   draw(ctx, project, applyRepulsion) {
     const p = project(this.x, this.y, this.z);
     const r = applyRepulsion(p.x, p.y);
-    const alpha = Math.max(0, (1 - this.z / 3000) * 0.15);
-    if (alpha <= 0) return;
-    const radius = (this.radius * p.size / 5);
+    const alpha = Math.max(0, Math.min(1, (1 - this.z / 3000) * 0.15));
+    if (alpha <= 0 || isNaN(alpha)) return;
+    const radius = Math.max(0.1, this.radius * p.size / 5);
     const grd = ctx.createRadialGradient(p.x + r.ox, p.y + r.oy, 0, p.x + r.ox, p.y + r.oy, radius);
-    grd.addColorStop(0, this.color.replace(')', ` / ${alpha})`));
+    const colorWithAlpha = this.color.replace(')', ` / ${alpha.toFixed(3)})`);
+    grd.addColorStop(0, colorWithAlpha);
     grd.addColorStop(1, 'transparent');
     ctx.fillStyle = grd;
     ctx.beginPath();
@@ -77,16 +78,16 @@ class Celestial {
   draw(ctx, project, applyRepulsion) {
     const p = project(this.x, this.y, this.z);
     const r = applyRepulsion(p.x, p.y);
-    const alpha = Math.max(0, (1 - this.z / 2500) * 0.9);
-    if (alpha <= 0) return;
-    const size = (this.size * p.size / 8);
+    const alpha = Math.max(0, Math.min(1, (1 - this.z / 2500) * 0.9));
+    if (alpha <= 0 || isNaN(alpha)) return;
+    const size = Math.max(0.1, this.size * p.size / 8);
     const cx = p.x + r.ox;
     const cy = p.y + r.oy;
     if (this.type === 'planet') {
       const grd = ctx.createRadialGradient(cx - size / 3, cy - size / 3, 0, cx, cy, size);
-      grd.addColorStop(0, '#fff');
-      grd.addColorStop(0.3, this.color.replace(')', ` / ${alpha})`));
-      grd.addColorStop(1, '#000');
+      grd.addColorStop(0, '#ffffff');
+      grd.addColorStop(0.3, this.color.replace(')', ` / ${alpha.toFixed(3)})`));
+      grd.addColorStop(1, '#000000');
       ctx.fillStyle = grd;
       ctx.beginPath(); ctx.arc(cx, cy, size, 0, Math.PI * 2); ctx.fill();
     } else {
@@ -95,7 +96,7 @@ class Celestial {
       ctx.beginPath(); ctx.arc(cx, cy, size / 10, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0;
       const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, size);
-      grd.addColorStop(0, this.color.replace(')', ` / ${alpha * 0.6})`));
+      grd.addColorStop(0, this.color.replace(')', ` / ${(alpha * 0.6).toFixed(3)})`));
       grd.addColorStop(1, 'transparent');
       ctx.fillStyle = grd;
       ctx.beginPath(); ctx.arc(cx, cy, size, 0, Math.PI * 2); ctx.fill();
@@ -123,9 +124,11 @@ export const UniverseBackground = () => {
     let currentSpeed = BASE_SPEED;
 
     const resize = () => {
-      canvas.width = window.innerWidth * window.devicePixelRatio;
-      canvas.height = window.innerHeight * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      
       if (isFirstMove.current) {
         pointer.current.x = window.innerWidth / 2;
         pointer.current.y = window.innerHeight / 2;
@@ -137,19 +140,22 @@ export const UniverseBackground = () => {
     const project = (x, y, z) => {
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
-      const scale = 1000 / (z || 1);
+      const scale = 1000 / (Math.max(0.1, z));
       return { x: x * scale + centerX, y: y * scale + centerY, size: scale };
     };
 
     const applyRepulsion = (x, y) => {
       const dx = x - pointer.current.smoothX;
       const dy = y - pointer.current.smoothY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const distSq = dx * dx + dy * dy;
       const radius = 250;
-      if (dist < radius) {
+      const radiusSq = radius * radius;
+      
+      if (distSq < radiusSq) {
+        const dist = Math.sqrt(distSq);
         const force = (radius - dist) / radius;
         const push = force * 60;
-        return { ox: (dx / dist) * push, oy: (dy / dist) * push };
+        return { ox: (dx / (dist || 1)) * push, oy: (dy / (dist || 1)) * push };
       }
       return { ox: 0, oy: 0 };
     };
@@ -163,8 +169,13 @@ export const UniverseBackground = () => {
       pointer.current.smoothX += (pointer.current.x - pointer.current.smoothX) * 0.1;
       pointer.current.smoothY += (pointer.current.y - pointer.current.smoothY) * 0.1;
       currentSpeed += (BASE_SPEED - currentSpeed) * 0.01;
+      
+      // Clear with identity transform or fill the exact screen size
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.fillStyle = 'black';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
       
       clouds.forEach(c => { c.update(currentSpeed); c.draw(ctx, project, applyRepulsion); });
       objects.forEach(o => { o.update(currentSpeed); o.draw(ctx, project, applyRepulsion); });

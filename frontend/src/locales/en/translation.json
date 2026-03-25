@@ -116,5 +116,7 @@
   "clearFilters": "Clear",
   "noFilteredRecords": "NO_MATCHING_ARTICLES",
   "noRecords": "NO_RECORDS_FOUND_IN_VAULT",
-  "loadingArchive": "COLLECTING_ARCHIVE_DATA..."
+  "loadingArchive": "COLLECTING_ARCHIVE_DATA...",
+  "latestProject": "LATEST_PROJECT",
+  "viewProject": "VIEW_PROJECT"
 }

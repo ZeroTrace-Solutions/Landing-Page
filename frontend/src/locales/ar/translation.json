@@ -108,6 +108,7 @@
   "backToSafety": "العودة نحو الأمان",
   "noRecords": "لم يتم العثور على سجلات",
   "loadingArchive": "جاري جمع بيانات الأرشيف...",
+  "latestProject": "أحدث_المشاريع",
   "whitepaperVersionLabel": "إصدار عقدة الأرشيف Ver_0.4.1",
   "readFullArticle": "اقرأ المقال كاملاً",
   "archivalSystem": "ZT // نظام الأرشفة",
@@ -116,5 +117,6 @@
   "searchArticlesPlaceholder": "ابحث بالعنوان أو الملخص أو المحتوى",
   "filterByDate": "تصفية حسب التاريخ",
   "clearFilters": "مسح",
-  "noFilteredRecords": "لا توجد مقالات مطابقة"
+  "noFilteredRecords": "لا توجد مقالات مطابقة",
+  "viewProject": "عرض_المشروع"
 }
