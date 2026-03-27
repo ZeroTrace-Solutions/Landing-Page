@@ -8,6 +8,8 @@ import { ProjectList } from '@/components/admin/ProjectList';
 import { DeleteProjectDialog } from '@/components/admin/DeleteProjectDialog';
 import { ProjectCredentialsPanel } from '@/components/admin/ProjectCredentialsPanel';
 import { EnvImportDialog } from '@/components/admin/EnvImportDialog';
+import { LiveDocsPanel } from '@/components/admin/LiveDocsPanel';
+import { Database, FileText } from 'lucide-react';
 
 export const ProjectsSection = ({ onUnsavedChangesChange = () => {} }) => {
   const [projects, setProjects] = useState([]);
@@ -22,6 +24,7 @@ export const ProjectsSection = ({ onUnsavedChangesChange = () => {} }) => {
   const [envImportClassification, setEnvImportClassification] = useState('IMPORTED');
   const [pendingEnvFile, setPendingEnvFile] = useState(null);
   const [isImportingEnv, setIsImportingEnv] = useState(false);
+  const [activeTab, setActiveTab] = useState('credentials');
 
   const cloneCredentials = (credentials = []) => credentials.map((credential) => ({ ...credential }));
 
@@ -179,6 +182,7 @@ export const ProjectsSection = ({ onUnsavedChangesChange = () => {} }) => {
 
     setSelectedProject(project);
     setLocalCredentials(cloneCredentials(project.credentials || []));
+    setActiveTab('credentials');
   };
 
   const handleChangeCredential = (index, field, value) => {
@@ -326,20 +330,53 @@ export const ProjectsSection = ({ onUnsavedChangesChange = () => {} }) => {
               isBusy={isDeleting}
             />
 
-            <div className="lg:col-span-3">
-              <ProjectCredentialsPanel
-                selectedProject={selectedProject}
-                credentials={localCredentials}
-                onChangeCredential={handleChangeCredential}
-                onRemoveCredential={handleRemoveCredential}
-                onAddCredential={handleAddCredential}
-                onSave={handleSaveAllCreds}
-                onDownloadEnv={handleDownloadEnv}
-                onUploadEnv={handleUploadEnv}
-                onLogoUpload={handleLogoUpload}
-                isBusy={isBusy}
-                saving={saving}
-              />
+            <div className="lg:col-span-3 space-y-6">
+              
+              <div className="flex gap-2 border-b border-white/10 pb-4">
+                <button
+                  onClick={() => setActiveTab('credentials')}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded flex items-center gap-2 transition-all ${
+                    activeTab === 'credentials' 
+                    ? 'bg-white text-black' 
+                    : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <Database size={12} /> Credentials
+                </button>
+                <button
+                  onClick={() => setActiveTab('live-docs')}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded flex items-center gap-2 transition-all ${
+                    activeTab === 'live-docs' 
+                    ? 'bg-blue-500 text-black' 
+                    : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <FileText size={12} /> Live Docs
+                </button>
+              </div>
+
+              {activeTab === 'credentials' && (
+                <ProjectCredentialsPanel
+                  selectedProject={selectedProject}
+                  credentials={localCredentials}
+                  onChangeCredential={handleChangeCredential}
+                  onRemoveCredential={handleRemoveCredential}
+                  onAddCredential={handleAddCredential}
+                  onSave={handleSaveAllCreds}
+                  onDownloadEnv={handleDownloadEnv}
+                  onUploadEnv={handleUploadEnv}
+                  onLogoUpload={handleLogoUpload}
+                  isBusy={isBusy}
+                  saving={saving}
+                />
+              )}
+
+              {activeTab === 'live-docs' && (
+                <LiveDocsPanel 
+                  selectedProject={selectedProject}
+                  isBusy={isBusy}
+                />
+              )}
             </div>
           </div>
         </div>

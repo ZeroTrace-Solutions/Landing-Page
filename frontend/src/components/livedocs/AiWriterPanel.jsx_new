@@ -1,0 +1,87 @@
+  const formatToHtml = (text) => {
+    // Stage 1: Normalize (AI sometimes outputs concatenated blocks without newlines)
+    let normalized = text
+      .replace(/([^\n])(#{1,4}\s?)/g, '$1\n$2') // Force newline before headers
+      .replace(/([^\n])(---)/g, '$1\n$2')       // Force newline before horizontal rules
+      .replace(/(\n[#]{1,4})(?!\s)/g, '$1 ')    // Ensure space after # markers
+      .replace(/([^\n])(> )/g, '$1\n$2');       // Force newline before blockquotes
+    
+    // Convert Markdown Tables first as they are multiline blocks
+    const tableRegex = /^\|(.+)\|$\n^\|[ :\-]+|$\n((?:^\|.+|$\n?)+)/gm;
+    let html = normalized.replace(tableRegex, (match) => {
+      const rows = match.trim().split('\n');
+      const headerRow = rows[0].split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+      const bodyRows = rows.slice(2).map(row => {
+        const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+        return `<tr>${cells}</tr>`;
+      }).join('');
+      return `<div class="table-wrapper"><table border="1"><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table></div>\n`;
+    });
+
+    const lines = html.split('\n');
+    let result = '';
+    let inList = false;
+
+    // Helper to process inline styles after block characters are stripped
+    const processInline = (str) => {
+      return str
+        .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/__(.*?)__/g, '<strong>$1</strong>')
+        .replace(/_(.*?)_/g, '<em>$1</em>');
+    };
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        if (inList) { result += '</ul>'; inList = false; }
+        return;
+      }
+
+      // Horizontal Rule
+      if (trimmed === '---' || trimmed === '<hr />') {
+        if (inList) { result += '</ul>'; inList = false; }
+        result += '<hr />';
+      } 
+      // Headers
+      else if (trimmed.startsWith('####')) {
+        if (inList) { result += '</ul>'; inList = false; }
+        result += `<h4>${processInline(trimmed.replace(/^#{4}\s?/, ''))}</h4>`;
+      } else if (trimmed.startsWith('###')) {
+        if (inList) { result += '</ul>'; inList = false; }
+        result += `<h3>${processInline(trimmed.replace(/^#{3}\s?/, ''))}</h3>`;
+      } else if (trimmed.startsWith('##')) {
+        if (inList) { result += '</ul>'; inList = false; }
+        result += `<h2>${processInline(trimmed.replace(/^#{2}\s?/, ''))}</h2>`;
+      } else if (trimmed.startsWith('#')) {
+        if (inList) { result += '</ul>'; inList = false; }
+        result += `<h1>${processInline(trimmed.replace(/^#{1}\s?/, ''))}</h1>`;
+      }
+      // Lists (Nested logic)
+      else if (/^(\s*)[-*]\s+/.test(line)) {
+        if (!inList) { result += '<ul>'; inList = true; }
+        const indentLevel = line.match(/^(\s*)/)[0].length;
+        const subLevelStyle = indentLevel > 1 ? ' style="margin-left: 20px; list-style-type: circle;"' : '';
+        result += `<li${subLevelStyle}>${processInline(trimmed.replace(/^[-*]\s+/, ''))}</li>`;
+      }
+      // Blockquotes
+      else if (trimmed.startsWith('> ')) {
+        if (inList) { result += '</ul>'; inList = false; }
+        result += `<blockquote>${processInline(trimmed.replace(/^>\s?/, ''))}</blockquote>`;
+      }
+      // Normal Paragraphs or Pre-formatted HTML (Tables)
+      else {
+        if (/^<[a-z]/.test(trimmed)) {
+          if (inList) { result += '</ul>'; inList = false; }
+          result += trimmed;
+        } else {
+          if (inList) { result += '</ul>'; inList = false; }
+          result += `<p>${processInline(trimmed)}</p>`;
+        }
+      }
+    });
+
+    if (inList) result += '</ul>';
+    return result;
+  };

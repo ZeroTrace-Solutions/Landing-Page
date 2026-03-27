@@ -1,0 +1,110 @@
+  const formatToHtml = (text) => {
+    // Stage 1: Absolute Normalization
+    // Strip carriage returns and ensure every section starting with #, ---, or > is on a new line
+    let cleanText = text
+      .replace(/\r/g, '')
+      .replace(/([^\n])(#{1,6}\s?)/g, '$1\n$2') 
+      .replace(/([^\n])(---)/g, '$1\n$2')
+      .replace(/([^\n])(>\s)/g, '$1\n$2');
+
+    // Convert Markdown Tables (multiline block)
+    const tableRegex = /^\|(.+)\|$\n^\|[ :\-]+|$\n((?:^\|.+|$\n?)+)/gm;
+    let html = cleanText.replace(tableRegex, (match) => {
+      const rows = match.trim().split('\n');
+      const headerRow = rows[0].split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+      const bodyRows = rows.slice(2).map(row => {
+        const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+        return `<tr>${cells}</tr>`;
+      }).join('');
+      return `<div class="table-wrapper"><table border="1"><thead><tr>${headerRow}</tr></thead><tbody>${bodyRows}</tbody></table></div>\n`;
+    });
+
+    const lines = html.split('\n');
+    let result = '';
+    let currentListType = null; // 'ul', 'ol', or null
+
+    const processInline = (str) => {
+      return str
+        .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/__(.*?)__/g, '<strong>$1</strong>')
+        .replace(/_(.*?)_/g, '<em>$1</em>');
+    };
+
+    const closeList = () => {
+      if (currentListType === 'ul') result += '</ul>';
+      else if (currentListType === 'ol') result += '</ol>';
+      currentListType = null;
+    };
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        closeList();
+        return;
+      }
+
+      // 1. Horizontal Rule
+      if (trimmed === '---') {
+        closeList();
+        result += '<hr />';
+        return;
+      }
+
+      // 2. Headers
+      const headerMatch = trimmed.match(/^(#{1,6})\s+(.*)$/) || trimmed.match(/^(#{1,6})(.*)$/);
+      if (headerMatch) {
+         closeList();
+         const level = headerMatch[1].length;
+         const content = headerMatch[2].trim();
+         result += `<h${level}>${processInline(content)}</h${level}>`;
+         return;
+      }
+
+      // 3. Lists
+      const olMatch = line.match(/^(\s*)(\d+)\.\s+(.*)$/);
+      const ulMatch = line.match(/^(\s*)([-*])\s+(.*)$/);
+
+      if (olMatch) {
+        if (currentListType !== 'ol') {
+          closeList();
+          result += '<ol>';
+          currentListType = 'ol';
+        }
+        result += `<li>${processInline(olMatch[3].trim())}</li>`;
+        return;
+      }
+
+      if (ulMatch) {
+        if (currentListType !== 'ul') {
+          closeList();
+          result += '<ul>';
+          currentListType = 'ul';
+        }
+        const indentLevel = ulMatch[1].length;
+        const subStyle = indentLevel > 1 ? ' style="margin-left: 20px; list-style-type: circle;"' : '';
+        result += `<li${subStyle}>${processInline(ulMatch[3].trim())}</li>`;
+        return;
+      }
+
+      // 4. Blockquotes
+      if (trimmed.startsWith('> ')) {
+        closeList();
+        result += `<blockquote>${processInline(trimmed.substring(2).trim())}</blockquote>`;
+        return;
+      }
+
+      // 5. Normal Content
+      if (/^<[a-z]/.test(trimmed)) {
+        closeList();
+        result += trimmed;
+      } else {
+        closeList();
+        result += `<p>${processInline(trimmed)}</p>`;
+      }
+    });
+
+    closeList();
+    return result;
+  };

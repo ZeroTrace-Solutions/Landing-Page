@@ -11,6 +11,8 @@ import { Portfolio } from '@/pages/Portfolio'
 import { Whitepaper } from '@/pages/Whitepaper'
 import { NotFound } from '@/pages/NotFound'
 import { AdminDashboard } from '@/pages/Admin/Dashboard'
+import { LiveDocPage } from '@/pages/LiveDocPage'
+import { DocPreviewPage } from '@/pages/DocPreviewPage'
 import { Toaster, toast } from 'sonner'
 import { auth } from '@/lib/firebase'
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth'
@@ -27,7 +29,8 @@ function App() {
   const location = useLocation();
 
   const isHome = location.pathname === '/';
-  const showCursor = location.pathname !== '/whitepaper';
+  const isDocPage = location.pathname.startsWith('/docs/');
+  const showCursor = location.pathname !== '/whitepaper' && !isDocPage;
   const shouldShowIntro = isHome && !showContent && !isMobileView;
 
   const handleIntroComplete = () => {
@@ -58,8 +61,8 @@ function App() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-transparent text-white selection:bg-white/20 font-sans">
-      <UniverseBackground />
+    <div className={`relative min-h-screen bg-transparent text-white selection:bg-white/20 font-sans ${isDocPage ? '!bg-black/95' : ''}`}>
+      {!isDocPage && <UniverseBackground />}
     
       {showCursor && (
         <SplashCursor
@@ -71,7 +74,7 @@ function App() {
         />
       )}
 
-      {!location.pathname.startsWith('/admin') && <LanguageToggle />}
+      {!location.pathname.startsWith('/admin') && !isDocPage && <LanguageToggle />}
 
       {shouldShowIntro && <VideoIntro onComplete={handleIntroComplete} />}
 
@@ -117,6 +120,8 @@ function App() {
               </div>
             }
           />
+          <Route path="/docs/:id" element={<LiveDocPage />} />
+          <Route path="/docs/:id/preview" element={<DocPreviewPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AnimatePresence>
