@@ -106,6 +106,9 @@ export const migrateData = async (portfolio, whitepaper) => {
 // ----------------------------------------------------
 
 export const hashPassword = async (plainText) => {
+  if (!window.crypto?.subtle) {
+    throw new Error('SECURE_CONTEXT_REQUIRED: crypto.subtle is not available. Please ensure the site is served over HTTPS.');
+  }
   const encoder = new TextEncoder();
   const data = encoder.encode(plainText);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);

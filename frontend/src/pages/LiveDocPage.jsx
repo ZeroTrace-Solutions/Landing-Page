@@ -22,6 +22,9 @@ import {
   proposeAiSolution, clearAiDraft
 } from '../services/dataService';
 
+import { auth } from '../lib/firebase';
+import { signInAnonymously } from 'firebase/auth';
+
 // Refactored Components
 import DocToolbar from '../components/livedocs/DocToolbar';
 import CommentsSidebar from '../components/livedocs/CommentsSidebar';
@@ -157,6 +160,12 @@ export const LiveDocPage = () => {
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', handleResize);
+    
+    // Ensure anonymous auth for guest access to Firestore
+    if (!auth.currentUser) {
+      signInAnonymously(auth).catch(err => console.error("Anonymous auth failed:", err));
+    }
+    
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -299,6 +308,7 @@ export const LiveDocPage = () => {
         setTimeout(() => setPasswordState('pending'), 800);
       }
     } catch (err) {
+      console.error("Verification error details:", err);
       toast.error(t('liveDocs.verificationFailed'));
       setPasswordState('pending');
     }
