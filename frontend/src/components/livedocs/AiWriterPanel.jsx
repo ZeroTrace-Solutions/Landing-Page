@@ -36,9 +36,24 @@ const AiWriterPanel = ({ editor, theme, currentUser, t }) => {
 
     const scriptId = 'puter-js-script';
     if (!document.getElementById(scriptId)) {
+      // Initialize Puter credentials from env if available 
+      // (This makes it work on new browsers/clear localstorage)
+      const envAppId = import.meta.env.VITE_PUTER_APP_ID;
+      const envAuthToken = import.meta.env.VITE_PUTER_AUTH_TOKEN;
+
+      if (envAppId && !localStorage.getItem('puter.app.id')) {
+        localStorage.setItem('puter.app.id', envAppId);
+      }
+      if (envAuthToken && !localStorage.getItem('puter.auth.token')) {
+        localStorage.setItem('puter.auth.token', envAuthToken);
+      }
+
       const script = document.createElement('script');
       script.id = scriptId;
       script.src = "https://js.puter.com/v2/";
+      // Also set on dataset for direct puter.js initialization
+      if (envAppId) script.dataset.appId = envAppId;
+
       script.onload = () => setPuterLoaded(true);
       script.onerror = () => console.error('Failed to load puter.js');
       document.body.appendChild(script);

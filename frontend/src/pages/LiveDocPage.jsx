@@ -10,7 +10,7 @@ import SignatureCanvas from 'react-signature-canvas';
 import {
   Printer, ShieldAlert, AlertTriangle, Users, MessageSquare,
   X, Check, RotateCcw, UserX, Loader2, Globe, Sun, Moon, Lock as LockIcon,
-  MessageCircle, Send
+  MessageCircle, Send, Menu, MoreHorizontal, ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -143,11 +143,37 @@ export const LiveDocPage = () => {
   const [pendingSignatureOpen, setPendingSignatureOpen] = useState(false);
   const signatureRef = useRef(null);
   const isFirstLoadRef = useRef(true);
+  const isFirstCommentsLoadRef = useRef(true);
+  const prevCommentsRef = useRef([]);
   const [syncStatus, setSyncStatus] = useState('synced');
   const [resolvingCommentId, setResolvingCommentId] = useState(null);
   const [aiReview, setAiReview] = useState(null);
   const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 });
   const [deleteCommentState, setDeleteCommentState] = useState({ isOpen: false, id: null, isBusy: false });
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Unified Notification Helper
+  const sendRefinedNotification = useCallback((title, message, type = 'info') => {
+    // 1. Always show toast (will be visible when user is/returns to foreground)
+    if (type === 'success') toast.success(message);
+    else if (type === 'error') toast.error(message);
+    else toast.info(message);
+
+    // 2. Show system notification if backgrounded (for immediate alert)
+    if (document.visibilityState !== 'visible' && "Notification" in window && Notification.permission === "granted") {
+      try {
+        new Notification(title, { body: message, icon: '/favicon.ico' });
+      } catch (e) { }
+    }
+  }, []);
 
   const FontSizeShortcuts = Extension.create({
     name: 'fontSizeShortcuts',
@@ -308,7 +334,8 @@ export const LiveDocPage = () => {
     const user = { name, isAdmin, key: userKey };
     setCurrentUser(user);
     await saveParticipant(id, userKey, {
-      name, isAdmin, device: navigator.userAgent, joinedAt: new Date().toISOString()
+      name, isAdmin, device: navigator.userAgent, joinedAt: new Date().toISOString(),
+      lastActiveAt: new Date().toISOString()
     });
     setNameState('authenticated');
   };
@@ -337,13 +364,12 @@ export const LiveDocPage = () => {
             editor.commands.setContent(contentBlock.html, false);
             if (!isFirstLoadRef.current) editor.commands.setTextSelection({ from, to });
           }
-          if (!isFirstLoadRef.current && !isSelfUpdate && "Notification" in window && Notification.permission === "granted") {
-            try {
-              new Notification(t('ZeroTrace Live Docs'), {
-                body: `${contentBlock.updatedBy} ` + t('liveDocs.madeEdits'),
-                icon: '/favicon.ico'
-              });
-            } catch (e) { }
+          
+          // Guest is notified ONLY if doc edited by admin and guest is backgrounded
+          if (!isFirstLoadRef.current && !isSelfUpdate && contentBlock.updatedBy === 'ZeroTrace' && !currentUserRef.current?.isAdmin) {
+            if (document.visibilityState !== 'visible') {
+              sendRefinedNotification(t('ZeroTrace Live Docs'), t('liveDocs.madeEdits'));
+            }
           }
         }
         isFirstLoadRef.current = false;
@@ -351,12 +377,48 @@ export const LiveDocPage = () => {
     });
 
     const unsubComments = subscribeToComments(id, (fetchedComments) => {
+      if (isFirstCommentsLoadRef.current) {
+        prevCommentsRef.current = fetchedComments;
+        isFirstCommentsLoadRef.current = false;
+        const activeComments = fetchedComments.filter(c => !c.resolved);
+        setComments(activeComments);
+        return;
+      }
+
+      const prevComments = prevCommentsRef.current;
+      fetchedComments.forEach(comment => {
+        const prev = prevComments.find(p => p.id === comment.id);
+        
+        // Admin is notified when a guest adds a comment
+        if (!prev && currentUserRef.current?.isAdmin && comment.authorName !== 'ZeroTrace') {
+          sendRefinedNotification(t('ZeroTrace Live Docs'), `New comment from ${comment.authorName}`);
+        }
+
+        // ONLY the guest who added the comment is notified when its resolved
+        if (prev && !prev.resolved && comment.resolved && currentUserRef.current?.key === comment.authorKey) {
+          sendRefinedNotification(t('ZeroTrace Live Docs'), t('liveDocs.resolveComment') || 'Comment resolved');
+        }
+      });
+
+      prevCommentsRef.current = fetchedComments;
       const activeComments = fetchedComments.filter(c => !c.resolved);
       setComments(activeComments);
     });
 
-    return () => { unsubMeta(); unsubContent(); unsubComments(); };
-  }, [nameState, currentUser, id, editor, navigate, t]);
+    // Heartbeat Interval for real-time presence (every 45s)
+    const heartbeatInterval = setInterval(() => {
+      if (document.visibilityState === 'visible' && currentUserRef.current) {
+        saveParticipant(id, currentUserRef.current.key, {
+          name: currentUserRef.current.name,
+          isAdmin: currentUserRef.current.isAdmin,
+          device: navigator.userAgent,
+          lastActiveAt: new Date().toISOString()
+        }).catch(() => { /* Silent failure for heartbeat */ });
+      }
+    }, 45000);
+
+    return () => { unsubMeta(); unsubContent(); unsubComments(); clearInterval(heartbeatInterval); };
+  }, [nameState, currentUser, id, editor, navigate, t, sendRefinedNotification]);
 
   useEffect(() => {
     if (!editor) return;
@@ -375,21 +437,23 @@ export const LiveDocPage = () => {
     if (!docMeta || !currentUser) return;
 
     const guestPending = docMeta.pendingFinalization && !docMeta.finalized && !currentUser.isAdmin;
+    
+    // Auto-open signature window if online (real-time transition)
     setPendingSignatureOpen(guestPending);
 
     if (guestPending && docMeta.pendingFinalizeNotification) {
-      if ("Notification" in window && Notification.permission === "granted") {
-        new Notification(t('ZeroTrace Live Docs'), {
-          body: t('liveDocs.pendingFinalizeNotification') || 'Document finalization is pending; please complete signature.',
-          icon: '/favicon.ico'
-        });
+      if (document.visibilityState !== 'visible' || isFirstLoadRef.current) {
+        sendRefinedNotification(
+          t('ZeroTrace Live Docs'), 
+          t('liveDocs.pendingFinalizeNotification') || 'Document finalization is pending; please complete signature.'
+        );
       }
 
       clearPendingFinalizeNotification(id).catch((err) => {
         console.error('Failed to clear pending finalize notification:', err);
       });
     }
-  }, [docMeta, currentUser, id, t]);
+  }, [docMeta, currentUser, id, t, sendRefinedNotification]);
 
   const handleKick = async (partKey) => {
     if (!currentUser?.isAdmin) return;
@@ -487,13 +551,34 @@ export const LiveDocPage = () => {
     });
   };
 
-  const handleContextMenuCopy = () => {
+  const handleContextMenuCopy = async () => {
     if (!editor) return;
     const { from, to } = editor.state.selection;
     const text = editor.state.doc.textBetween(from, to, ' ');
     if (text) {
-      navigator.clipboard.writeText(text);
-      toast.success(t('liveDocs.copied') || 'Copied to clipboard');
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          toast.success(t('liveDocs.copied') || 'Copied to clipboard');
+        } else {
+          // Fallback legacy copy
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-9999px";
+          textArea.style.top = "0";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          const success = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          if (success) toast.success(t('liveDocs.copied') || 'Copied to clipboard');
+          else throw new Error('EXEC_COMMAND_FAILED');
+        }
+      } catch (err) {
+        console.error('Failed to copy text:', err);
+        toast.error('COPY_FAILED');
+      }
     }
   };
 
@@ -845,13 +930,13 @@ export const LiveDocPage = () => {
   return (
     <div className={`${theme === 'dark' ? 'selection:bg-blue-500 selection:text-white' : 'selection:bg-blue-600 selection:text-white'} transition-colors duration-500`} dir={i18n.dir()}>
       <div className={`screen-view flex flex-col h-screen ${theme === 'dark' ? 'bg-[#09090b] text-white' : 'bg-neutral-100 text-black'} print:hidden no-print`}>
-        <div className={`h-[52px] border-b ${theme === 'dark' ? 'bg-[#18181b]/80 border-white/10' : 'bg-white/80 border-black/10'} backdrop-blur-xl flex items-center justify-between px-4 no-print z-40 w-full shrink-0`}>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
+        <div className={`h-[64px] sm:h-[52px] border-b ${theme === 'dark' ? 'bg-[#18181b]/80 border-white/10' : 'bg-white/80 border-black/10'} backdrop-blur-xl flex items-center justify-between px-4 no-print z-[60] w-full shrink-0 relative order-first`}>
+          <div className="flex items-center gap-3 sm:gap-6 overflow-hidden">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${theme === 'dark' ? 'bg-blue-500/10' : 'bg-blue-500/20'}`}>
                 <ShieldAlert className="text-blue-500" size={16} />
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col hidden sm:flex">
                 <span className="text-[10px] font-black uppercase tracking-widest leading-none drop-shadow-sm">ZT LiveDocs</span>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <div className={`w-1.5 h-1.5 rounded-full ${syncStatus === 'synced' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
@@ -861,25 +946,37 @@ export const LiveDocPage = () => {
                 </div>
               </div>
             </div>
-            <DocToolbar editor={editor} theme={theme} />
+            
+            <div className="overflow-x-auto no-scrollbar py-1">
+               <DocToolbar editor={editor} theme={theme} />
+            </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex -space-x-2 no-print overflow-hidden mr-4">
-              {Object.values(participants).slice(0, 3).map((p, idx) => (
-                <div key={idx} className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-[10px] font-bold ${theme === 'dark' ? 'bg-neutral-800 border-[#18181b]' : 'bg-neutral-200 border-white'}`} title={p.name}>
-                  {p.name.charAt(0)}
-                </div>
-              ))}
-              {Object.keys(participants).length > 3 && (
-                <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-[8px] font-bold ${theme === 'dark' ? 'bg-blue-500 text-black border-[#18181b]' : 'bg-blue-500 text-white border-white'}`}>
-                  +{Object.keys(participants).length - 3}
-                </div>
-              )}
-            </div>
+          <div className="flex items-center gap-3">
+            {/* Desktop Participants */}
+            {!isMobile && (
+              <div className="flex -space-x-2 no-print overflow-hidden mr-2">
+                {Object.values(participants).slice(0, 3).map((p, idx) => {
+                  const isOnline = p.lastActiveAt && (new Date() - new Date(p.lastActiveAt)) < (90 * 1000);
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all duration-500 scale-90 ${
+                        isOnline 
+                          ? 'border-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)] animate-pulse' 
+                          : (theme === 'dark' ? 'bg-neutral-800 border-white/10' : 'bg-neutral-200 border-black/10')
+                      } ${theme === 'dark' ? 'text-white' : 'text-black'}`} 
+                      title={`${p.name} ${isOnline ? '(Online)' : '(Offline)'}`}
+                    >
+                      {p.name.charAt(0)}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
-            <button onClick={() => setCommentsPanelOpen(true)} className={`relative p-2 rounded-lg border ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-600'} hover:scale-105 transition-all`}>
-              <MessageSquare size={16} />
+            <button onClick={() => setCommentsPanelOpen(true)} className={`relative p-2.5 rounded-xl border ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-600'} hover:scale-105 active:scale-95 transition-all`}>
+              <MessageSquare size={18} />
               {comments.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center border-2 border-inherit">
                   {comments.length}
@@ -887,25 +984,83 @@ export const LiveDocPage = () => {
               )}
             </button>
 
-            <div className="h-6 w-px bg-white/10 mx-2" />
-            <button onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')} className={`p-2 rounded-lg border ${theme === 'dark' ? 'bg-[#09090b] border-white/10 text-white hover:bg-white/5' : 'bg-white border-black/10 text-black hover:bg-black/5'} transition-all text-[9px] font-black uppercase tracking-widest flex items-center gap-2`}>
-              <Globe size={14} /> {i18n.language === 'en' ? 'AR' : 'EN'}
-            </button>
-            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className={`p-2 rounded-lg border ${theme === 'dark' ? 'bg-[#09090b] border-white/10 text-white hover:bg-white/5' : 'bg-white border-black/10 text-black hover:bg-black/5'} transition-all`}>
-              {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
-            </button>
-            <button onClick={() => window.print()} className={`px-4 py-2 border ${theme === 'dark' ? 'border-white/20 hover:border-white/40 text-white' : 'border-black/20 hover:border-black/40 text-black'} rounded text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group transition-all`}>
-              <Printer size={12} /> {t('liveDocs.print')}
-            </button>
-            {!docMeta?.finalized && !docMeta?.pendingFinalization && currentUser?.isAdmin && (
-              <button onClick={handleRequestFinalize} className="px-6 py-2 bg-blue-500 hover:bg-blue-400 text-black rounded text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all">
-                <LockIcon size={12} /> {t('liveDocs.finalize')}
-              </button>
-            )}
-            {docMeta?.pendingFinalization && currentUser?.isAdmin && (
-              <button disabled className="px-6 py-2 bg-amber-400 text-black rounded text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all">
-                <LockIcon size={12} /> {t('liveDocs.finalizePending') || 'Finalize Pending'}
-              </button>
+            {/* Mobile Dropdown Trigger */}
+            {isMobile ? (
+              <div className="relative">
+                <button 
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+                  className={`p-2.5 rounded-xl border flex items-center gap-1 transition-all active:scale-95 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white' : 'bg-black/5 border-black/10 text-black'}`}
+                >
+                  <Menu size={20} />
+                  <ChevronDown size={14} className={`transition-transform duration-300 ${mobileMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {mobileMenuOpen && (
+                    <>
+                      <motion.div 
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="fixed inset-0 z-40"
+                      />
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        className={`absolute top-full right-0 mt-2 w-56 rounded-2xl border shadow-2xl p-2 z-50 overflow-hidden ${theme === 'dark' ? 'bg-[#18181b] border-white/10 shadow-black' : 'bg-white border-black/10 shadow-black/10'}`}
+                      >
+                         <div className="flex flex-col gap-1">
+                            <button onClick={() => { i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en'); setMobileMenuOpen(false); }} className={`flex items-center gap-3 w-full p-3 rounded-xl transition-colors ${theme === 'dark' ? 'hover:bg-white/5 text-white/70 hover:text-white' : 'hover:bg-black/5 text-black/70 hover:text-black'}`}>
+                              <Globe size={16} />
+                              <span className="text-[11px] font-bold uppercase tracking-wider flex-1 text-left">{i18n.language === 'en' ? 'Arabic' : 'English'}</span>
+                            </button>
+                            <button onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setMobileMenuOpen(false); }} className={`flex items-center gap-3 w-full p-3 rounded-xl transition-colors ${theme === 'dark' ? 'hover:bg-white/5 text-white/70 hover:text-white' : 'hover:bg-black/5 text-black/70 hover:text-black'}`}>
+                              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                              <span className="text-[11px] font-bold uppercase tracking-wider flex-1 text-left">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                            </button>
+                            <button onClick={() => { window.print(); setMobileMenuOpen(false); }} className={`flex items-center gap-3 w-full p-3 rounded-xl transition-colors ${theme === 'dark' ? 'hover:bg-white/5 text-white/70 hover:text-white' : 'hover:bg-black/5 text-black/70 hover:text-black'}`}>
+                              <Printer size={16} />
+                              <span className="text-[11px] font-bold uppercase tracking-wider flex-1 text-left">{t('liveDocs.print')}</span>
+                            </button>
+
+                            <div className={`h-px my-1 ${theme === 'dark' ? 'bg-white/5' : 'bg-black/5'}`} />
+                            
+                            {!docMeta?.finalized && !docMeta?.pendingFinalization && currentUser?.isAdmin && (
+                              <button onClick={() => { handleRequestFinalize(); setMobileMenuOpen(false); }} className="flex items-center gap-3 w-full p-3 rounded-xl bg-blue-500 text-black hover:bg-blue-400 font-bold transition-all">
+                                <LockIcon size={16} />
+                                <span className="text-[11px] font-black uppercase tracking-widest">{t('liveDocs.finalize')}</span>
+                              </button>
+                            )}
+                         </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              /* Desktop Actions */
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-px bg-white/10 mx-2" />
+                <button onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')} className={`p-2 rounded-xl border ${theme === 'dark' ? 'bg-[#09090b] border-white/10 text-white hover:bg-white/5' : 'bg-white border-black/10 text-black hover:bg-black/5'} transition-all text-[9px] font-black uppercase tracking-widest flex items-center gap-2`}>
+                  <Globe size={14} /> {i18n.language === 'en' ? 'AR' : 'EN'}
+                </button>
+                <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className={`p-2 rounded-xl border ${theme === 'dark' ? 'bg-[#09090b] border-white/10 text-white hover:bg-white/5' : 'bg-white border-black/10 text-black hover:bg-black/5'} transition-all`}>
+                  {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+                </button>
+                <button onClick={() => window.print()} className={`px-4 py-2 border ${theme === 'dark' ? 'border-white/20 hover:border-white/40 text-white' : 'border-black/20 hover:border-black/40 text-black'} rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group transition-all`}>
+                  <Printer size={12} /> {t('liveDocs.print')}
+                </button>
+                {!docMeta?.finalized && !docMeta?.pendingFinalization && currentUser?.isAdmin && (
+                  <button onClick={handleRequestFinalize} className="px-5 py-2 bg-blue-500 hover:bg-blue-400 text-black rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all">
+                    <LockIcon size={12} /> {t('liveDocs.finalize')}
+                  </button>
+                )}
+                {docMeta?.pendingFinalization && currentUser?.isAdmin && (
+                  <button disabled className="px-5 py-2 bg-amber-400 text-black rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all opacity-80">
+                    <LockIcon size={12} /> {t('liveDocs.finalizePending')}
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>

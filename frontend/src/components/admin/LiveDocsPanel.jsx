@@ -76,10 +76,37 @@ export const LiveDocsPanel = ({ selectedProject, isBusy }) => {
     }
   };
 
-  const handleCopyLink = (docId) => {
-    const link = `${window.location.origin}/docs/${docId}`;
-    navigator.clipboard.writeText(link);
-    toast.success('INVITATIONAL_LINK_COPIED');
+  const handleCopyLink = async (docId) => {
+    try {
+      const link = `${window.location.origin}/docs/${docId}`;
+      
+      // Try navigator.clipboard first
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(link);
+        toast.success('INVITATIONAL_LINK_COPIED');
+      } else {
+        // Fallback for non-secure contexts or legacy browsers
+        const textArea = document.createElement("textarea");
+        textArea.value = link;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (success) {
+          toast.success('INVITATIONAL_LINK_COPIED');
+        } else {
+          throw new Error('EXEC_COMMAND_FAILED');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to copy document link:', err);
+      toast.error('COPY_FAILED');
+    }
   };
 
   const handleDelete = async (docId) => {
@@ -264,7 +291,12 @@ const DocCard = ({ doc, onDelete, onClose, onCopy }) => {
           {/* Admin Tools */}
           <div className="flex w-full justify-between gap-2">
             <button 
-              onClick={onCopy}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onCopy();
+              }}
               className="flex-1 px-2 py-1.5 flex items-center justify-center gap-1 text-[9px] font-bold uppercase tracking-widest text-white/50 hover:text-white hover:bg-white/5 rounded transition-all"
               title="Copy Link (Anyone with password)"
             >
@@ -272,7 +304,12 @@ const DocCard = ({ doc, onDelete, onClose, onCopy }) => {
             </button>
             {!doc.closed && (
               <button 
-                onClick={onClose}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onClose();
+                }}
                 className="flex-1 px-2 py-1.5 flex items-center justify-center gap-1 text-[9px] font-bold uppercase tracking-widest text-amber-500/50 hover:text-amber-500 hover:bg-amber-500/10 rounded transition-all"
                 title="Permanently Close"
               >
@@ -280,7 +317,12 @@ const DocCard = ({ doc, onDelete, onClose, onCopy }) => {
               </button>
             )}
             <button 
-              onClick={onDelete}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete();
+              }}
               className="flex-1 px-2 py-1.5 flex items-center justify-center gap-1 text-[9px] font-bold uppercase tracking-widest text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
               title="Delete Doc"
             >
