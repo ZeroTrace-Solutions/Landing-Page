@@ -1,11 +1,11 @@
 # Stage 1: Build the React application
-FROM node:20-alpine as build
+FROM node:22-alpine as build
 
 WORKDIR /app
 
 # Install dependencies first (better for Docker caching)
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps && npm cache clean --force
 
 # Copy the rest of the source code and build
 COPY . .
