@@ -105,15 +105,89 @@ export const migrateData = async (portfolio, whitepaper) => {
 // Live Docs API
 // ----------------------------------------------------
 
-export const hashPassword = async (plainText) => {
-  if (!window.crypto?.subtle) {
-    throw new Error('SECURE_CONTEXT_REQUIRED: crypto.subtle is not available. Please ensure the site is served over HTTPS.');
+// Pure JavaScript SHA-256 implementation for non-secure contexts (HTTP)
+const sha256Fallback = (ascii) => {
+  function rightRotate(value, amount) {
+    return (value >>> amount) | (value << (32 - amount));
   }
-  const encoder = new TextEncoder();
-  const data = encoder.encode(plainText);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const mathPow = Math.pow;
+  const maxWord = mathPow(2, 32);
+  const lengthProperty = 'length';
+  let i, j;
+  let result = '';
+  const words = [];
+  const asciiBitLength = ascii[lengthProperty] * 8;
+  const hash = [];
+  const k = [];
+  let primeCounter = 0;
+  const isPrime = (n) => {
+    for (let factor = 2; factor * factor <= n; factor++) if (n % factor === 0) return false;
+    return true;
+  };
+  const getFractionalBits = (n) => ((n - Math.floor(n)) * maxWord) | 0;
+
+  let n = 2;
+  while (primeCounter < 64) {
+    if (isPrime(n)) {
+      if (primeCounter < 8) hash[primeCounter] = getFractionalBits(mathPow(n, 0.5));
+      k[primeCounter] = getFractionalBits(mathPow(n, 1 / 3));
+      primeCounter++;
+    }
+    n++;
+  }
+
+  ascii += '\x80';
+  while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+  for (i = 0; i < ascii[lengthProperty]; i++) {
+    j = ascii.charCodeAt(i);
+    if (j >> 8) return; // NOT_ASCII
+    words[i >> 2] |= j << ((3 - i) % 4) * 8;
+  }
+  words[words[lengthProperty]] = (asciiBitLength / maxWord) | 0;
+  words[words[lengthProperty]] = asciiBitLength | 0;
+
+  for (j = 0; j < words[lengthProperty]; ) {
+    const w = words.slice(j, (j += 16));
+    const oldHash = hash.slice(0);
+    for (i = 0; i < 64; i++) {
+      let w15 = w[i - 15], w2 = w[i - 2];
+      const s0 = rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3);
+      const s1 = rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10);
+      const ch = (hash[4] & hash[5]) ^ (~hash[4] & hash[6]);
+      const maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
+      const t1 = hash[7] + (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25)) + ch + k[i] + (w[i] = (i < 16) ? w[i] : (w[i - 16] + s0 + w[i - 7] + s1) | 0);
+      const t2 = (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22)) + maj;
+      hash[7] = hash[6]; hash[6] = hash[5]; hash[5] = hash[4]; hash[4] = (hash[3] + t1) | 0;
+      hash[3] = hash[2]; hash[2] = hash[1]; hash[1] = hash[0]; hash[0] = (t1 + t2) | 0;
+    }
+    for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+  }
+
+  for (i = 0; i < 8; i++) {
+    for (j = 3; j + 1; j--) {
+      const b = (hash[i] >> j * 8) & 255;
+      result += (b < 16 ? '0' : '') + b.toString(16);
+    }
+  }
+  return result;
+};
+
+export const hashPassword = async (plainText) => {
+  // Try native SubtleCrypto first (Secure context only)
+  if (window.crypto?.subtle) {
+    try {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(plainText);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (e) {
+      console.warn("SubtleCrypto failed, using software fallback", e);
+    }
+  }
+  
+  // Software Fallback for non-secure contexts (HTTP)
+  return sha256Fallback(plainText);
 };
 
 export const getLiveDocs = async (projectId) => {
