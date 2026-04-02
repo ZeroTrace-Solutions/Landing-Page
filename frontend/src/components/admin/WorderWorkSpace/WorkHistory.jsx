@@ -21,12 +21,59 @@ export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHi
   });
 
   const formatTime = (ms) => {
-    const totalSeconds = Math.floor(ms / 1000);
+    const totalSeconds = Math.floor((ms || 0) / 1000);
     const h = Math.floor(totalSeconds / 3600);
     const m = Math.floor((totalSeconds % 3600) / 60);
     return `${h}h ${m}m`;
   };
 
+  // Calculate total from current logs (completed segments)
+  const sessionTotal = React.useMemo(() => {
+    let total = 0;
+    let lastIn = null;
+    logs.forEach(log => {
+      const time = new Date(log.timestamp).getTime();
+      if (isNaN(time)) return;
+      if (log.type === 'clockin') {
+        lastIn = time;
+      } else if (log.type === 'break' || log.type === 'clockout') {
+        if (lastIn) {
+          total += (time - lastIn);
+          lastIn = null;
+        }
+      }
+    });
+    return total;
+  }, [logs]);
+
+  // Handle ticking for active session
+  const [activeExtra, setActiveExtra] = React.useState(0);
+  React.useEffect(() => {
+    if (status !== 'clockin') {
+      setActiveExtra(0);
+      return;
+    }
+
+    // Find the start time of the current active block
+    let lastInTime = 0;
+    for (let i = logs.length - 1; i >= 0; i--) {
+      if (logs[i].type === 'clockin') {
+        lastInTime = new Date(logs[i].timestamp).getTime();
+        break;
+      }
+      // If we hit a break or clockout after the last clockin, it's not an active block
+      if (logs[i].type === 'break' || logs[i].type === 'clockout') break;
+    }
+
+    if (!lastInTime) return;
+
+    const timer = setInterval(() => {
+      setActiveExtra(Math.max(0, Date.now() - lastInTime));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [logs, status]);
+
+  const displayTotal = (totalHours || 0) + sessionTotal + activeExtra;
   const isClockedIn = status === 'clockin';
 
   const confirmClear = async () => {
@@ -86,7 +133,7 @@ export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHi
             </span>
           </div>
           <div className="text-xl font-black">
-            {totalHours ? formatTime(totalHours) : "0h 0m"}
+            {displayTotal > 0 ? formatTime(displayTotal) : "0h 0m"}
           </div>
         </div>
       </div>
@@ -148,7 +195,7 @@ export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHi
                   {month}
                 </span>
                 <span className="text-[11px] font-black text-white/30">
-                  {data.totalHours || "0h"}
+                  {typeof data.totalHours === 'number' ? formatTime(data.totalHours) : (data.totalHours || "0h")}
                 </span>
               </div>
             ))}
