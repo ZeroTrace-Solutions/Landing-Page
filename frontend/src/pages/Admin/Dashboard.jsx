@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
-  getPortfolioData,
-  getWhitepaperData,
-  getProjectsData,
   migrateData
 } from '../../services/dataService';
 import { PortfolioSection } from './PortfolioSection';
 import { WhitepaperSection } from './WhitepaperSection';
 import { ProjectsSection } from './ProjectsSection';
+import { WorkerWorkspace } from './WorkerWorkspace/WorkerWorkspace';
 import portfolioDataJSON from '../../components/data/portfolioData.json';
 import whitepaperDataJSON from '../../components/data/whitepaperData.json';
 import { toast } from 'sonner';
 import { AlertTriangle, Database, Zap, ShieldAlert, ChevronLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import {
   AlertDialog,
@@ -26,14 +24,15 @@ import {
 } from "../../components/ui/alert-dialog";
 
 export const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('portfolio');
-  const [loading, setLoading] = useState(true);
   const [isMigrating, setIsMigrating] = useState(false);
   const [isMigrationDialogOpen, setIsMigrationDialogOpen] = useState(false);
   const [unsavedByTab, setUnsavedByTab] = useState({
     portfolio: false,
     whitepaper: false,
     projects: false,
+    "work-space": false,
   });
 
   const hasAnyUnsavedChanges = Object.values(unsavedByTab).some(Boolean);
@@ -103,6 +102,11 @@ export const AdminDashboard = () => {
       return;
     }
 
+    if (tab === 'work-space') {
+      navigate('/admin/work-space');
+      return;
+    }
+
     setActiveTab(tab);
   };
 
@@ -123,7 +127,7 @@ export const AdminDashboard = () => {
   return (
     <div className="relative min-h-screen text-white p-4 sm:p-8 pt-20 sm:pt-24 font-sans z-10" dir="ltr">
       {/* Semi-transparent background overlay to allow UniverseBackground to peek through */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm -z-10" />
+      <div className="fixed inset-0 -z-10 bg-transparent" />
 
       {/* Return Navigation - Responsive Wrapper */}
       <>
@@ -228,7 +232,7 @@ export const AdminDashboard = () => {
         </AlertDialog>
 
         <div className="flex flex-wrap gap-2 sm:gap-4 mb-8">
-          {['portfolio', 'whitepaper', 'projects'].map(tab => (
+          {['portfolio', 'whitepaper', 'projects', 'work-space'].map(tab => (
             <button
               key={tab}
               onClick={() => handleTabSwitch(tab)}
@@ -260,6 +264,8 @@ export const AdminDashboard = () => {
           )}
         </div>
       </div>
+
+      {/* WorkerWorkspace is now route-driven: /admin/work-space, not inline overlay. */}
     </div>
   );
 };

@@ -84,7 +84,7 @@
 
 .admin-font,
 .admin-font * {
-  font-family: 'ZTMS', serif !important;
+  font-family: 'ZTMS', serif;
 }
 
 html, body {
@@ -96,25 +96,34 @@ html, body {
   padding: 0;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-/* Custom Scrollbar for specific containers */
-.custom-scrollbar::-webkit-scrollbar {
-  display: block;
-  width: 6px;
+/* Global custom scrollbar styling to inherit theme palette */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.24) rgba(0, 0, 0, 0.15);
 }
-.custom-scrollbar::-webkit-scrollbar-track {
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
   background: transparent;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.2);
-  border-radius: 10px;
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.4);
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(59, 130, 246, 0.2) transparent;
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 @custom-variant dark (&:is(.dark *));

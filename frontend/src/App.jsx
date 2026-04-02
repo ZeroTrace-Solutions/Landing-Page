@@ -4,13 +4,13 @@ import { AnimatePresence, motion as Motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { UniverseBackground } from '@/components/ui/universe-background'
 import LanguageToggle from '@/components/ui/LanguageToggle'
-import { VideoIntro } from '@/components/ui/video-intro'
 import SplashCursor from '@/components/SplashCursor'
 import { Main } from '@/pages/Main'
 import { Portfolio } from '@/pages/Portfolio'
 import { Whitepaper } from '@/pages/Whitepaper'
 import { NotFound } from '@/pages/NotFound'
 import { AdminDashboard } from '@/pages/Admin/Dashboard'
+import { WorkerWorkspace } from '@/pages/Admin/WorkerWorkspace/WorkerWorkspace'
 import { LiveDocPage } from '@/pages/LiveDocPage'
 import { DocPreviewPage } from '@/pages/DocPreviewPage'
 import { Toaster, toast } from 'sonner'
@@ -19,24 +19,11 @@ import { signInAnonymously, onAuthStateChanged } from 'firebase/auth'
 
 function App() {
   const { i18n: i18nObj } = useTranslation();
-  const [showContent, setShowContent] = useState(() => {
-    return sessionStorage.getItem('introPlayed') === 'true';
-  });
-  const [isMobileView, setIsMobileView] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(max-width: 767px)').matches;
-  });
   const location = useLocation();
 
-  const isHome = location.pathname === '/';
   const isDocPage = location.pathname.startsWith('/docs/');
   const showCursor = location.pathname !== '/whitepaper' && !isDocPage;
-  const shouldShowIntro = isHome && !showContent && !isMobileView;
 
-  const handleIntroComplete = () => {
-    sessionStorage.setItem('introPlayed', 'true');
-    setShowContent(true);
-  };
 
   useEffect(() => {
     const isAdmin = location.pathname.startsWith('/admin');
@@ -46,22 +33,10 @@ function App() {
     document.body.classList.toggle('font-arabic', lang === 'ar' && !isAdmin);
   }, [i18nObj.language, location.pathname]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    const mediaQuery = window.matchMedia('(max-width: 767px)');
-    const onChange = (event) => setIsMobileView(event.matches);
 
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', onChange);
-      return () => mediaQuery.removeEventListener('change', onChange);
-    }
-
-    mediaQuery.addListener(onChange);
-    return () => mediaQuery.removeListener(onChange);
-  }, []);
 
   return (
-    <div className={`relative min-h-screen bg-transparent text-white selection:bg-white/20 font-sans ${isDocPage ? '!bg-black/95' : ''}`}>
+    <div className={`relative min-h-screen overflow-x-hidden bg-transparent text-white selection:bg-white/20 font-sans ${isDocPage ? '!bg-black/95' : ''}`}>
       {!isDocPage && <UniverseBackground />}
     
       {showCursor && (
@@ -76,13 +51,11 @@ function App() {
 
       {!location.pathname.startsWith('/admin') && !isDocPage && <LanguageToggle />}
 
-      {shouldShowIntro && <VideoIntro onComplete={handleIntroComplete} />}
-
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route
             path="/"
-            element={!shouldShowIntro ? <Main /> : <div />}
+            element={<Main />}
           />
           <Route
             path="/portfolio"
@@ -116,6 +89,16 @@ function App() {
               <div className="admin-font">
                 <AdminProtection>
                   <AdminDashboard />
+                </AdminProtection>
+              </div>
+            }
+          />
+          <Route
+            path="/admin/work-space"
+            element={
+              <div className="admin-font">
+                <AdminProtection>
+                  <WorkerWorkspace isFullScreen />
                 </AdminProtection>
               </div>
             }

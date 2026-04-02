@@ -128,7 +128,7 @@ export const UniverseBackground = () => {
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      
+
       if (isFirstMove.current) {
         pointer.current.x = window.innerWidth / 2;
         pointer.current.y = window.innerHeight / 2;
@@ -150,7 +150,7 @@ export const UniverseBackground = () => {
       const distSq = dx * dx + dy * dy;
       const radius = 250;
       const radiusSq = radius * radius;
-      
+
       if (distSq < radiusSq) {
         const dist = Math.sqrt(distSq);
         const force = (radius - dist) / radius;
@@ -169,14 +169,14 @@ export const UniverseBackground = () => {
       pointer.current.smoothX += (pointer.current.x - pointer.current.smoothX) * 0.1;
       pointer.current.smoothY += (pointer.current.y - pointer.current.smoothY) * 0.1;
       currentSpeed += (BASE_SPEED - currentSpeed) * 0.01;
-      
+
       // Clear with identity transform or fill the exact screen size
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.fillStyle = 'black';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.restore();
-      
+
       clouds.forEach(c => { c.update(currentSpeed); c.draw(ctx, project, applyRepulsion); });
       objects.forEach(o => { o.update(currentSpeed); o.draw(ctx, project, applyRepulsion); });
       stars.forEach(s => { s.update(currentSpeed); s.draw(ctx, project, applyRepulsion); });

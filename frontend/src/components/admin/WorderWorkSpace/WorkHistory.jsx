@@ -1,0 +1,160 @@
+import React from "react";
+import { History, Calendar, Clock, BarChart3, AlertTriangle, Trash2 } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHistory, status }) => {
+  const [showConfirm, setShowConfirm] = React.useState(false);
+
+  const currentMonth = new Date().toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const formatTime = (ms) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    return `${h}h ${m}m`;
+  };
+
+  const isClockedIn = status === 'clockin';
+
+  const confirmClear = async () => {
+    await onClearHistory?.();
+    setShowConfirm(false);
+  };
+
+  return (
+    <div className="flex flex-col min-h-0 h-full gap-4">
+      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <AlertDialogContent className="border-red-500/20 bg-black/90">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-3 text-red-500">
+              <AlertTriangle className="animate-pulse" />
+              Deleting Logs Warning
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-white/60">
+              {isClockedIn
+                ? "Warning: Worker is currently clocked in. Deleting logs will force an emergency checkout and wipe all active session data. This action is irreversible."
+                : "You are about to wipe all active session logs for this worker. Archived history will remain intact. Proceed with data deletion?"
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-white/5 border-white/10 hover:bg-white/10 text-white">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmClear}
+              className="bg-red-500 text-white hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+            >
+              Confirm Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className="flex items-center gap-4 mb-2">
+        <h3 className="text-[12px] font-bold text-white/70">
+          History Logs
+        </h3>
+        <button
+          onClick={() => setShowConfirm(true)}
+          className="ml-auto text-[11px] font-bold text-white/60 hover:text-red-400 transition-colors flex items-center gap-2"
+        >
+          <Trash2 size={12} />
+          Delete Logs
+        </button>
+        <div className="h-[1px] flex-grow bg-white/5" />
+      </div>
+
+      {/* Stats Summary */}
+      <div className="mb-4">
+        <div className="p-4 bg-white/5 border border-white/5 rounded-2xl">
+          <div className="flex items-center gap-2 text-white/40 mb-2">
+            <Clock size={14} className="text-white/60" />
+            <span className="text-[11px] font-bold text-white/70">
+              Total work time
+            </span>
+          </div>
+          <div className="text-xl font-black">
+            {totalHours ? formatTime(totalHours) : "0h 0m"}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-grow min-h-0 overflow-hidden">
+        <div className="h-full min-h-0 overflow-y-auto custom-scrollbar space-y-3 pr-2 py-2" data-lenis-prevent>
+          {/* Current Month Logs */}
+          <div className="text-[11px] font-bold text-white/60 mb-2">
+            {currentMonth}
+          </div>
+
+          {logs.length === 0 ? (
+            <div className="text-center py-8 text-[11px] text-white/20 font-medium">
+              No logs recorded for this session
+            </div>
+          ) : (
+            logs.map((log, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5 rounded-xl hover:bg-white/5 transition-all"
+                style={{ maxHeight: "56px", overflow: "hidden" }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${log.type === "clockin" ? "bg-green-500" : log.type === "break" ? "bg-yellow-500" : "bg-red-500"}`}
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold capitalize text-white/80">
+                      {log.type}
+                    </span>
+                    <span className="text-[9px] text-white/30 font-mono">
+                      {new Date(log.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-[11px] font-bold text-white/60">
+                  {new Date(log.timestamp).toLocaleDateString()}
+                </div>
+              </motion.div>
+            ))
+          )}
+
+          {/* Global Summary History */}
+          <div className="mt-8 border-t border-white/5 pt-4">
+            <div className="flex items-center gap-2 text-white/20 mb-4">
+              <History size={14} className="text-white/50" />
+              <span className="text-[12px] font-bold text-white/60">
+                Archived history
+              </span>
+            </div>
+            {Object.entries(history).map(([month, data]) => (
+              <div
+                key={month}
+                className="flex justify-between p-3 border-b border-white/5 group hover:bg-white/[0.01]"
+              >
+                <span className="text-[11px] font-bold text-white/60 group-hover:text-white transition-colors">
+                  {month}
+                </span>
+                <span className="text-[11px] font-black text-white/30">
+                  {data.totalHours || "0h"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
