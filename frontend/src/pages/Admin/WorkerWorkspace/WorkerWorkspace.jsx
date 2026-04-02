@@ -23,27 +23,48 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 // eslint-disable-next-line no-unused-vars
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
 export const WorkerWorkspace = ({ isFullScreen = false }) => {
+  const { workerId } = useParams();
+  const navigate = useNavigate();
+
   const [workers, setWorkers] = useState([]);
-  const [selectedWorkerId, setSelectedWorkerId] = useState(null);
+  const [selectedWorkerId, setSelectedWorkerId] = useState(workerId || null);
   const [activeWindows, setActiveWindows] = useState({}); // { workerId: { timer: bool, notebook: bool, ... } }
   const [isAddWorkerOpen, setIsAddWorkerOpen] = useState(false);
   const [newWorkerName, setNewWorkerName] = useState('');
   const [newWorkerAvatar, setNewWorkerAvatar] = useState('');
+
+  // Sync URL changes to local state
+  useEffect(() => {
+    if (workerId && workerId !== selectedWorkerId) {
+      setSelectedWorkerId(workerId);
+    }
+  }, [workerId]);
 
   // Fetch all workers real-time
   useEffect(() => {
     const unsub = subscribeToWorkers((data) => {
       setWorkers(data);
       if (!selectedWorkerId && data.length > 0) {
-        setSelectedWorkerId(data[0].id);
+        const firstId = data[0].id;
+        setSelectedWorkerId(firstId);
+        // Replace current URL with the first worker if root route
+        if (!workerId) {
+          navigate(`/admin/work-space/${firstId}`, { replace: true });
+        }
       }
     });
     return () => unsub();
-  }, [selectedWorkerId]);
+  }, [selectedWorkerId, workerId, navigate]);
+
+  const handleSetSelectedWorkerId = (id) => {
+    setSelectedWorkerId(id);
+    navigate(`/admin/work-space/${id}`);
+  };
 
   const selectedWorker = useMemo(() =>
     workers.find(w => w.id === selectedWorkerId),
@@ -82,11 +103,11 @@ export const WorkerWorkspace = ({ isFullScreen = false }) => {
       <WorkerSidebar
         workers={workers}
         selectedWorkerId={selectedWorkerId}
-        setSelectedWorkerId={setSelectedWorkerId}
+        setSelectedWorkerId={handleSetSelectedWorkerId}
         setIsAddWorkerOpen={setIsAddWorkerOpen}
       />
 
-      <div className="ml-20 sm:ml-24 h-full relative overflow-hidden p-8 flex flex-col">
+      <div className="ml-0 lg:ml-24 h-full relative overflow-hidden p-4 pt-[80px] lg:pt-8 lg:p-8 flex flex-col">
         {selectedWorker ? (
           <>
             <WorkerHeader

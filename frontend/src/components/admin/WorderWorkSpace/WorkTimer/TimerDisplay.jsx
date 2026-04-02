@@ -43,7 +43,7 @@ const DIGIT_MAPS = {
 
 const PARTICLE_COUNT = 30; // Number of particles per digit
 
-const ParticleDigit = ({ value, currentStatus, isMaximized }) => {
+const ParticleDigit = ({ value, currentStatus, multiplier }) => {
   const points = useMemo(() => DIGIT_MAPS[value] || [], [value]);
   
   // Fill all particles with a point. If points are fewer than particles, reuse or hide.
@@ -51,17 +51,17 @@ const ParticleDigit = ({ value, currentStatus, isMaximized }) => {
     const res = [];
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       if (i < points.length) {
-        res.push({ x: points[i][0] * 12, y: points[i][1] * 12, opacity: 1, scale: 1 });
+        res.push({ x: points[i][0] * multiplier, y: points[i][1] * multiplier, opacity: 1, scale: 1 });
       } else {
         // Hide unused particles or cluster at center
-        res.push({ x: 3 * 12, y: 3 * 12, opacity: 0, scale: 0 });
+        res.push({ x: 3 * multiplier, y: 3 * multiplier, opacity: 0, scale: 0 });
       }
     }
     return res;
-  }, [points]);
+  }, [points, multiplier]);
 
   return (
-    <div className={`relative ${isMaximized ? 'w-[75px] h-[100px]' : 'w-[50px] h-[70px]'}`}>
+    <div className="relative" style={{ width: (5 * multiplier) + 8, height: (6 * multiplier) + 8 }}>
       {particlePoints.map((p, i) => (
         <motion.div
           key={i}
@@ -89,6 +89,17 @@ const ParticleDigit = ({ value, currentStatus, isMaximized }) => {
 };
 
 export const TimerDisplay = ({ timeObject, currentStatus, isMaximized }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  const multiplier = isMobile ? 6.5 : (isMaximized ? 12 : 9);
+
   const units = [
     { label: 'Hours', value: timeObject.H, id: 'H' },
     { label: 'Minutes', value: timeObject.M, id: 'M' },
@@ -97,16 +108,16 @@ export const TimerDisplay = ({ timeObject, currentStatus, isMaximized }) => {
 
   return (
     <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none p-4">
-      <div className={`flex items-baseline ${isMaximized ? 'gap-6 md:gap-14' : 'gap-3 md:gap-8'}`}>
+      <div className={`flex items-baseline ${isMobile ? 'gap-2' : (isMaximized ? 'gap-14' : 'gap-8')}`}>
         {units.map((unit) => (
           <div key={unit.id} className="flex flex-col items-center gap-2 md:gap-4">
-            <div className="flex gap-2 md:gap-3">
+            <div className={`flex ${isMobile ? 'gap-1.5' : 'gap-3'}`}>
               {unit.value.split('').map((digit, dIdx) => (
                 <ParticleDigit 
                   key={`${unit.id}-${dIdx}`} 
                   value={digit} 
                   currentStatus={currentStatus} 
-                  isMaximized={isMaximized}
+                  multiplier={multiplier}
                 />
               ))}
             </div>

@@ -76,7 +76,9 @@ export const WorkerWindows = ({
     );
   }
 
-  return (
+  const isMobile = viewport.width < 1024;
+
+  const renderWindows = () => (
     <>
       <DraggableWindow
         title="Work Timer"
@@ -85,6 +87,7 @@ export const WorkerWindows = ({
         defaultPosition={{ x: layouts.timer.x, y: layouts.timer.y }}
         defaultSize={{ width: layouts.timer.width, height: layouts.timer.height }}
         noPadding={true}
+        isMobile={isMobile}
       >
         <WorkTimer
           key={selectedWorker.id}
@@ -106,6 +109,7 @@ export const WorkerWindows = ({
         onClose={() => toggleWindow(selectedWorker.id, 'notebook')}
         defaultPosition={{ x: layouts.notebook.x, y: layouts.notebook.y }}
         defaultSize={{ width: layouts.notebook.width, height: layouts.notebook.height }}
+        isMobile={isMobile}
       >
         <CollaborativeNotebook 
           workerId={selectedWorker.id} 
@@ -122,6 +126,7 @@ export const WorkerWindows = ({
         onClose={() => toggleWindow(selectedWorker.id, 'checklist')}
         defaultPosition={{ x: layouts.checklist.x, y: layouts.checklist.y }}
         defaultSize={{ width: layouts.checklist.width, height: layouts.checklist.height }}
+        isMobile={isMobile}
       >
         <CollaborativeChecklist workerId={selectedWorker.id} items={selectedWorker.checklist} onSync={(field, data) => syncWorkerField(selectedWorker.id, field, data)} />
       </DraggableWindow>
@@ -132,6 +137,7 @@ export const WorkerWindows = ({
         onClose={() => toggleWindow(selectedWorker.id, 'history')}
         defaultPosition={{ x: layouts.history.x, y: layouts.history.y }}
         defaultSize={{ width: layouts.history.width, height: layouts.history.height }}
+        isMobile={isMobile}
       >
         <WorkHistory
           logs={(selectedWorker.workTimes || []).map((t, i) => ({
@@ -146,4 +152,14 @@ export const WorkerWindows = ({
       </DraggableWindow>
     </>
   );
+
+  if (isMobile) {
+    return (
+      <div className="absolute inset-0 pt-20 pb-32 px-4 overflow-y-auto custom-scrollbar flex flex-col gap-6 pointer-events-auto z-[45]">
+        {renderWindows()}
+      </div>
+    );
+  }
+
+  return renderWindows();
 };

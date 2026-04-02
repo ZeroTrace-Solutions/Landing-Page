@@ -94,7 +94,7 @@ function App() {
             }
           />
           <Route
-            path="/admin/work-space"
+            path="/admin/work-space/:workerId?"
             element={
               <div className="admin-font">
                 <AdminProtection>

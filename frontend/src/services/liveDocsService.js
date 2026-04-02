@@ -1,0 +1,265 @@
+import { db } from "../lib/firebase";
+import { 
+  collection, 
+  getDocs, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  setDoc,
+  query,
+  getDoc,
+  onSnapshot,
+  where
+} from "firebase/firestore";
+
+// Pure JavaScript SHA-256 implementation for non-secure contexts (HTTP)
+const sha256Fallback = (ascii) => {
+  function rightRotate(value, amount) {
+    return (value >>> amount) | (value << (32 - amount));
+  }
+  const mathPow = Math.pow;
+  const maxWord = mathPow(2, 32);
+  const lengthProperty = 'length';
+  let i, j;
+  let result = '';
+  const words = [];
+  const asciiBitLength = ascii[lengthProperty] * 8;
+  const hash = [];
+  const k = [];
+  let primeCounter = 0;
+  const isPrime = (n) => {
+    for (let factor = 2; factor * factor <= n; factor++) if (n % factor === 0) return false;
+    return true;
+  };
+  const getFractionalBits = (n) => ((n - Math.floor(n)) * maxWord) | 0;
+
+  let n = 2;
+  while (primeCounter < 64) {
+    if (isPrime(n)) {
+      if (primeCounter < 8) hash[primeCounter] = getFractionalBits(mathPow(n, 0.5));
+      k[primeCounter] = getFractionalBits(mathPow(n, 1 / 3));
+      primeCounter++;
+    }
+    n++;
+  }
+
+  ascii += '\x80';
+  while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+  for (i = 0; i < ascii[lengthProperty]; i++) {
+    j = ascii.charCodeAt(i);
+    if (j >> 8) return; // NOT_ASCII
+    words[i >> 2] |= j << ((3 - i) % 4) * 8;
+  }
+  words[words[lengthProperty]] = (asciiBitLength / maxWord) | 0;
+  words[words[lengthProperty]] = asciiBitLength | 0;
+
+  for (j = 0; j < words[lengthProperty]; ) {
+    const w = words.slice(j, (j += 16));
+    const oldHash = hash.slice(0);
+    for (i = 0; i < 64; i++) {
+      let w15 = w[i - 15], w2 = w[i - 2];
+      const s0 = rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3);
+      const s1 = rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10);
+      const ch = (hash[4] & hash[5]) ^ (~hash[4] & hash[6]);
+      const maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
+      const t1 = hash[7] + (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25)) + ch + k[i] + (w[i] = (i < 16) ? w[i] : (w[i - 16] + s0 + w[i - 7] + s1) | 0);
+      const t2 = (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22)) + maj;
+      hash[7] = hash[6]; hash[6] = hash[5]; hash[5] = hash[4]; hash[4] = (hash[3] + t1) | 0;
+      hash[3] = hash[2]; hash[2] = hash[1]; hash[1] = hash[0]; hash[0] = (t1 + t2) | 0;
+    }
+    for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+  }
+
+  for (i = 0; i < 8; i++) {
+    for (j = 3; j + 1; j--) {
+      const b = (hash[i] >> j * 8) & 255;
+      result += (b < 16 ? '0' : '') + b.toString(16);
+    }
+  }
+  return result;
+};
+
+export const hashPassword = async (plainText) => {
+  if (window.crypto?.subtle) {
+    try {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(plainText);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (e) {
+      console.warn("SubtleCrypto failed, using software fallback", e);
+    }
+  }
+  return sha256Fallback(plainText);
+};
+
+export const getLiveDocs = async (projectId) => {
+  const q = query(collection(db, "liveDocs"), where("projectId", "==", projectId));
+  const querySnapshot = await getDocs(q);
+  const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return docs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+};
+
+export const createLiveDoc = async (projectId, name, password, projectMeta) => {
+  const passwordHash = await hashPassword(password);
+  const docData = {
+    projectId,
+    name,
+    projectName: projectMeta?.name || 'ZeroTrace',
+    projectLogo: projectMeta?.logo || null,
+    passwordHash,
+    createdAt: new Date().toISOString(),
+    finalized: false,
+    closed: false,
+    participants: {}
+  };
+  const docRef = await addDoc(collection(db, "liveDocs"), docData);
+  await setDoc(doc(db, "liveDocs", docRef.id, "blocks", "content"), {
+    html: "",
+    updatedAt: new Date().toISOString(),
+    updatedBy: "System"
+  });
+  return docRef.id;
+};
+
+export const deleteLiveDoc = async (docId) => {
+  await deleteDoc(doc(db, "liveDocs", docId));
+};
+
+export const closeDoc = async (docId) => {
+  const docRef = doc(db, "liveDocs", docId);
+  await updateDoc(docRef, { closed: true });
+};
+
+export const getLiveDocMeta = async (docId) => {
+  const docRef = doc(db, "liveDocs", docId);
+  const snapshot = await getDoc(docRef);
+  if (snapshot.exists()) {
+    return { id: snapshot.id, ...snapshot.data() };
+  }
+  return null;
+};
+
+export const subscribeToDocMeta = (docId, callback) => {
+  const docRef = doc(db, "liveDocs", docId);
+  return onSnapshot(docRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback({ id: docSnap.id, ...docSnap.data() });
+    } else {
+      callback(null);
+    }
+  });
+};
+
+export const subscribeToDocContent = (docId, callback) => {
+  const q = query(collection(db, "liveDocs", docId, "blocks"));
+  return onSnapshot(q, (snapshot) => {
+    const blocks = {};
+    snapshot.forEach(doc => {
+      blocks[doc.id] = { id: doc.id, ...doc.data() };
+    });
+    callback(blocks['content']);
+  });
+};
+
+export const saveDocContent = async (docId, html, updatedBy) => {
+  const docRef = doc(db, "liveDocs", docId, "blocks", "content");
+  await setDoc(docRef, {
+    html: html || "",
+    updatedBy: updatedBy || "Anonymous",
+    updatedAt: new Date().toISOString()
+  }, { merge: true });
+};
+
+export const subscribeToComments = (docId, callback) => {
+  const q = query(collection(db, "liveDocs", docId, "comments"));
+  return onSnapshot(q, (snapshot) => {
+    const comments = [];
+    snapshot.forEach(doc => {
+      comments.push({ id: doc.id, ...doc.data() });
+    });
+    comments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    callback(comments);
+  });
+};
+
+export const addComment = async (docId, data) => {
+  const commentsRef = collection(db, "liveDocs", docId, "comments");
+  await addDoc(commentsRef, {
+    ...data,
+    resolved: false,
+    createdAt: new Date().toISOString()
+  });
+};
+
+export const resolveComment = async (docId, commentId) => {
+  const commentRef = doc(db, "liveDocs", docId, "comments", commentId);
+  await updateDoc(commentRef, { resolved: true, aiDraft: null });
+};
+
+export const proposeAiSolution = async (docId, commentId, proposedText, originalText) => {
+  const commentRef = doc(db, "liveDocs", docId, "comments", commentId);
+  await updateDoc(commentRef, { 
+    aiDraft: { proposedText, originalText, proposedAt: new Date().toISOString() } 
+  });
+};
+
+export const clearAiDraft = async (docId, commentId) => {
+  const commentRef = doc(db, "liveDocs", docId, "comments", commentId);
+  await updateDoc(commentRef, { aiDraft: null });
+};
+
+export const updateComment = async (docId, commentId, text) => {
+  const commentRef = doc(db, "liveDocs", docId, "comments", commentId);
+  await updateDoc(commentRef, { text, updatedAt: new Date().toISOString() });
+};
+
+export const deleteComment = async (docId, commentId) => {
+  const commentRef = doc(db, "liveDocs", docId, "comments", commentId);
+  await deleteDoc(commentRef);
+};
+
+export const saveParticipant = async (docId, key, info) => {
+  const docRef = doc(db, "liveDocs", docId);
+  await updateDoc(docRef, {
+    [`participants.${key}`]: info
+  });
+};
+
+export const kickParticipant = async (docId, key) => {
+  const docRef = doc(db, "liveDocs", docId);
+  await updateDoc(docRef, {
+    [`participants.${key}.kickedAt`]: new Date().toISOString()
+  });
+};
+
+export const markDocPendingFinalization = async (docId, requestedBy) => {
+  const docRef = doc(db, "liveDocs", docId);
+  await updateDoc(docRef, {
+    pendingFinalization: true,
+    pendingFinalizationRequestedBy: requestedBy,
+    pendingFinalizationRequestedAt: new Date().toISOString(),
+    pendingFinalizeNotification: true,
+    finalized: false
+  });
+};
+
+export const clearPendingFinalizeNotification = async (docId) => {
+  const docRef = doc(db, "liveDocs", docId);
+  await updateDoc(docRef, {
+    pendingFinalizeNotification: false
+  });
+};
+
+export const finalizeDoc = async (docId, signatureDataUrl, signerName) => {
+  const docRef = doc(db, "liveDocs", docId);
+  await updateDoc(docRef, {
+    finalized: true,
+    pendingFinalization: false,
+    signature: signatureDataUrl,
+    signerName: signerName,
+    finalizedAt: new Date().toISOString()
+  });
+};

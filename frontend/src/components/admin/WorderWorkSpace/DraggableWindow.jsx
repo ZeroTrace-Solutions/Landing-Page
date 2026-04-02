@@ -11,7 +11,8 @@ export const DraggableWindow = ({
   defaultSize = { width: 350, height: 450 },
   defaultPosition = { x: 50, y: 50 },
   noPadding = false,
-  customBg = null
+  customBg = null,
+  isMobile = false
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -57,6 +58,53 @@ export const DraggableWindow = ({
 
   if (!isOpen) return null;
 
+  if (isMobile) {
+    return (
+      <div 
+        className={`flex flex-col w-full flex-shrink-0 transition-all duration-300 border border-white/10 overflow-hidden shadow-2xl ${customBg || 'bg-black/90 backdrop-blur-3xl'} ${isMaximized ? 'fixed inset-0 z-[100] rounded-none !h-[100dvh] !border-0' : 'rounded-3xl relative'}`}
+        style={isMaximized ? {} : { minHeight: isMinimized ? 56 : (defaultSize.height || 400), height: isMinimized ? 56 : undefined }}
+      >
+        {/* Mobile Header (No drag handle class) */}
+        <div 
+          className="flex items-center justify-between px-5 py-4 bg-white/5 border-b border-white/5 select-none shrink-0"
+          onClick={isMinimized ? toggleMinimize : undefined}
+        >
+          <div className="flex items-center gap-3">
+            <div className={`w-2.5 h-2.5 rounded-full transition-colors ${isMinimized ? 'bg-amber-400' : 'bg-white/20'}`} />
+            <span className="text-sm font-bold text-white/70">{title}</span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={(e) => { e.stopPropagation(); toggleMinimize(); }}
+              className="p-1.5 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-white/40 hover:text-white"
+            >
+              <Minus size={14} />
+            </button>
+            <button 
+              onClick={(e) => { e.stopPropagation(); toggleMaximize(); }}
+              className="p-1.5 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-white/40 hover:text-white"
+            >
+              {isMaximized ? <Square size={12} /> : <Maximize2 size={12} />}
+            </button>
+            <button 
+              onClick={(e) => { e.stopPropagation(); handleClose(); }}
+              className="p-1.5 bg-white/5 hover:bg-red-500/20 rounded-full transition-colors text-white/40 hover:text-red-500"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+        {/* Content */}
+        {!isMinimized && (
+          <div className={`relative flex-grow min-h-0 overflow-auto custom-scrollbar ${noPadding ? 'p-0' : 'p-4'}`}>
+            {React.Children.map(children, child => React.isValidElement(child) ? React.cloneElement(child, { isMaximized }) : child)}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   const effectiveWidth = parentBounds.width || viewport.width;
   const effectiveHeight = parentBounds.height || viewport.height;
 
@@ -65,14 +113,12 @@ export const DraggableWindow = ({
   const normalizedWidth = Math.min(defaultSize.width, maxWidth);
   const normalizedHeight = Math.min(defaultSize.height, maxHeight);
 
-  // Ensure the window is fully visible inside workspace by clamping position based on size
   const maxX = Math.max(10, effectiveWidth - normalizedWidth - 10);
   const maxY = Math.max(10, effectiveHeight - normalizedHeight - 10);
 
   const normalizedX = Math.min(defaultPosition.x, maxX);
   const normalizedY = Math.min(defaultPosition.y, maxY);
 
-  // If the default position itself would push the window off-screen, reposition inside
   const safeX = defaultPosition.x + normalizedWidth > effectiveWidth ? maxX : normalizedX;
   const safeY = defaultPosition.y + normalizedHeight > effectiveHeight ? maxY : normalizedY;
 
@@ -93,6 +139,7 @@ export const DraggableWindow = ({
         bounds={isMaximized ? 'window' : 'parent'}
         enableResizing={!isMinimized && !isMaximized}
         disableDragging={isMinimized || isMaximized}
+        cancel=".window-controls"
         style={{
           zIndex: isMaximized ? 999 : 50,
           position: isMaximized ? 'fixed' : 'absolute',
@@ -128,7 +175,7 @@ export const DraggableWindow = ({
               <span className="text-[11px] font-bold text-white/70">{title}</span>
             </div>
             
-            <div className="flex items-center gap-1">
+            <div className="window-controls flex items-center gap-1">
               <button 
                 onClick={toggleMinimize}
                 className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/40 hover:text-white"

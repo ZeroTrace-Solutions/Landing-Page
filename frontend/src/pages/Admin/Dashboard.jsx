@@ -166,7 +166,7 @@ export const AdminDashboard = () => {
           className="md:hidden fixed top-4 left-4 z-50 flex items-center gap-2 bg-black/60 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-full shadow-lg active:scale-95 transition-all"
         >
           <ChevronLeft size={14} className="text-white" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-white">NEXUS_PORTAL</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-white">Back to Portal</span>
         </Link>
       </>
 
