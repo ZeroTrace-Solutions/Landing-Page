@@ -5,6 +5,7 @@ import { TimerDisplay } from './TimerDisplay';
 import { TimerControls } from './TimerControls';
 import { TimerParticles } from './TimerParticles';
 import { buildDigitTargets } from './TimerUtils';
+import { calculateElapsedTime } from './calculationUtils';
 
 export const WorkTimer = ({
   workerId,
@@ -69,80 +70,8 @@ export const WorkTimer = ({
 
     const compute = () => {
       const now = Date.now();
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const todayStart = today.getTime();
-
-      if (activeStatus === 'clockout') {
-        setElapsedTime(0);
-        return;
-      }
-
-      if (activeStatus === 'break') {
-        let breakStartTime = 0;
-        for (let i = workStatus.length - 1; i >= 0; i--) {
-          if (workStatus[i] === 'break') {
-            const t = new Date(workTimes[i]).getTime();
-            if (!isNaN(t)) breakStartTime = t;
-          } else {
-            break;
-          }
-        }
-        setElapsedTime(breakStartTime > 0 ? Math.max(0, now - breakStartTime) : 0);
-        return;
-      }
-
-      if (activeStatus === 'clockin') {
-        const safeLength = Math.min(workStatus.length, workTimes.length);
-        if (safeLength === 0) {
-          setElapsedTime(0);
-          return;
-        }
-
-        // 1. Find the HARD START of this session
-        // A session starts after the LATEST 'clockout' or the start of the day.
-        let sessionBoundaryIndex = 0;
-        for (let i = safeLength - 1; i >= 0; i--) {
-          const t = new Date(workTimes[i]).getTime();
-          if (isNaN(t)) continue;
-          if (workStatus[i] === 'clockout') {
-            sessionBoundaryIndex = i + 1;
-            break;
-          }
-          if (t < todayStart) {
-            sessionBoundaryIndex = i + 1;
-            break;
-          }
-        }
-
-        // 2. Sum up work intervals WITHIN this session only
-        let sessionWorkMs = 0;
-        let runningWorkStart = null;
-
-        for (let i = sessionBoundaryIndex; i < safeLength; i++) {
-          const s = workStatus[i];
-          const t = new Date(workTimes[i]).getTime();
-          if (isNaN(t)) continue;
-
-          if (s === 'clockin') {
-            // Start of a new work block (could be first or following a break)
-            runningWorkStart = t;
-          } else if (s === 'break' && runningWorkStart !== null) {
-            // End of a work block because of break
-            sessionWorkMs += Math.max(0, t - runningWorkStart);
-            runningWorkStart = null;
-          }
-        }
-
-        // 3. Add current active block if still clocked in
-        if (runningWorkStart !== null) {
-          // Double-check: ensure the running session start is localized to today
-          const effectiveSessionStart = Math.max(runningWorkStart, todayStart);
-          sessionWorkMs += Math.max(0, now - effectiveSessionStart);
-        }
-
-        setElapsedTime(isNaN(sessionWorkMs) ? 0 : sessionWorkMs);
-      }
+      const elapsed = calculateElapsedTime(workStatus, workTimes, now);
+      setElapsedTime(elapsed);
     };
 
     compute();

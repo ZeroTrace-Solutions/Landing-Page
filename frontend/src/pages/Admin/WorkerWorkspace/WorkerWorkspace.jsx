@@ -115,6 +115,10 @@ export const WorkerWorkspace = ({ isFullScreen = false }) => {
               activeWindows={activeWindows}
               toggleWindow={toggleWindow}
               onAvatarChange={(newAvatar) => syncWorkerField(selectedWorker.id, 'avatar', newAvatar)}
+              onClockIn={() => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString())}
+              onClockOut={() => updateWorkerStatus(selectedWorker.id, 'clockout', new Date().toISOString())}
+              onTakeBreak={() => updateWorkerStatus(selectedWorker.id, 'break', new Date().toISOString())}
+              onEndBreak={() => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString())}
             />
 
             <div className="flex-grow relative">
