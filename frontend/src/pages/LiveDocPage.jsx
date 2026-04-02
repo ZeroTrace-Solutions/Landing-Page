@@ -169,6 +169,19 @@ export const LiveDocPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Autotoggle to light theme when printing
+  useEffect(() => {
+    const handleBeforePrint = () => {
+      if (theme === 'dark') setTheme('light');
+    };
+
+    window.addEventListener('beforeprint', handleBeforePrint);
+    
+    return () => {
+      window.removeEventListener('beforeprint', handleBeforePrint);
+    };
+  }, [theme]);
+
   // Unified Notification Helper
   const sendRefinedNotification = useCallback((title, message, type = 'info') => {
     // 1. Always show toast (will be visible when user is/returns to foreground)
@@ -871,6 +884,14 @@ export const LiveDocPage = () => {
     }
   };
 
+  const handlePrint = () => {
+    if (theme === 'dark') setTheme('light');
+    setTimeout(() => {
+      window.print();
+      if (isMobile) setMobileMenuOpen(false);
+    }, 150);
+  };
+
   // Selection & Mouse listeners
   useEffect(() => {
     if (!editor || kicked || docMeta?.finalized || docMeta?.closed || docMeta?.pendingFinalization || focusedComment) return;
@@ -985,7 +1006,7 @@ export const LiveDocPage = () => {
               </div>
             )}
 
-            <button onClick={() => setCommentsPanelOpen(true)} className={`relative p-2.5 rounded-xl border ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-600'} hover:scale-105 active:scale-95 transition-all`}>
+            <button onClick={() => setCommentsPanelOpen(true)} className={`relative p-2.5 rounded-xl border ${theme === 'dark' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-600'} hover:scale-105 active:scale-95 transition-all ${i18n.dir() === 'rtl' ? 'mr-4' : 'ml-4'}`}>
               <MessageSquare size={18} />
               {comments.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center border-2 border-inherit">
@@ -1017,7 +1038,7 @@ export const LiveDocPage = () => {
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className={`absolute top-full right-0 mt-2 w-56 rounded-2xl border shadow-2xl p-2 z-50 overflow-hidden ${theme === 'dark' ? 'bg-[#18181b] border-white/10 shadow-black' : 'bg-white border-black/10 shadow-black/10'}`}
+                        className={`fixed top-[70px] ${i18n.dir() === 'rtl' ? 'left-4' : 'right-4'} w-56 rounded-2xl border shadow-2xl p-2 z-[100] overflow-y-auto max-h-[80vh] ${theme === 'dark' ? 'bg-[#18181b] border-white/10 shadow-black' : 'bg-white border-black/10 shadow-black/10'}`}
                       >
                          <div className="flex flex-col gap-1">
                             <button onClick={() => { i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en'); setMobileMenuOpen(false); }} className={`flex items-center gap-3 w-full p-3 rounded-xl transition-colors ${theme === 'dark' ? 'hover:bg-white/5 text-white/70 hover:text-white' : 'hover:bg-black/5 text-black/70 hover:text-black'}`}>
@@ -1028,7 +1049,7 @@ export const LiveDocPage = () => {
                               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                               <span className="text-[11px] font-bold uppercase tracking-wider flex-1 text-left">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                             </button>
-                            <button onClick={() => { window.print(); setMobileMenuOpen(false); }} className={`flex items-center gap-3 w-full p-3 rounded-xl transition-colors ${theme === 'dark' ? 'hover:bg-white/5 text-white/70 hover:text-white' : 'hover:bg-black/5 text-black/70 hover:text-black'}`}>
+                            <button onClick={handlePrint} className={`flex items-center gap-3 w-full p-3 rounded-xl transition-colors ${theme === 'dark' ? 'hover:bg-white/5 text-white/70 hover:text-white' : 'hover:bg-black/5 text-black/70 hover:text-black'}`}>
                               <Printer size={16} />
                               <span className="text-[11px] font-bold uppercase tracking-wider flex-1 text-left">{t('liveDocs.print')}</span>
                             </button>
@@ -1057,7 +1078,7 @@ export const LiveDocPage = () => {
                 <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className={`p-2 rounded-xl border ${theme === 'dark' ? 'bg-[#09090b] border-white/10 text-white hover:bg-white/5' : 'bg-white border-black/10 text-black hover:bg-black/5'} transition-all`}>
                   {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
                 </button>
-                <button onClick={() => window.print()} className={`px-4 py-2 border ${theme === 'dark' ? 'border-white/20 hover:border-white/40 text-white' : 'border-black/20 hover:border-black/40 text-black'} rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group transition-all`}>
+                <button onClick={handlePrint} className={`px-4 py-2 border ${theme === 'dark' ? 'border-white/20 hover:border-white/40 text-white' : 'border-black/20 hover:border-black/40 text-black'} rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group transition-all`}>
                   <Printer size={12} /> {t('liveDocs.print')}
                 </button>
                 {!docMeta?.finalized && !docMeta?.pendingFinalization && currentUser?.isAdmin && (

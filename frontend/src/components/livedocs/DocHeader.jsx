@@ -11,8 +11,8 @@ const DocHeader = ({ docMeta, theme, t, i18n, id, isPrintView }) => {
       <div className={`no-print absolute -bottom-24 -right-24 w-64 h-64 rounded-full blur-[100px] opacity-10 ${isDark ? 'bg-purple-500' : 'bg-purple-300'}`} />
 
       {/* Main Header Content */}
-      <div className="w-full grid grid-cols-3 items-center z-10">
-        <div className="flex items-center gap-4">
+      <div className="w-full flex flex-col sm:grid sm:grid-cols-3 items-center gap-8 sm:gap-4 z-10">
+        <div className="flex items-center gap-4 sm:justify-start justify-center">
           <div className="relative">
             <div className={`absolute inset-0 blur-lg opacity-20 ${isDark ? 'bg-blue-500' : 'bg-blue-300'}`} />
             {docMeta?.projectLogo ? (
@@ -40,7 +40,7 @@ const DocHeader = ({ docMeta, theme, t, i18n, id, isPrintView }) => {
           </div>
         </div>
 
-        <div className={`text-right flex flex-col items-end ${i18n.dir() === 'rtl' ? 'items-start text-left' : ''}`}>
+        <div className={`text-center sm:text-right flex flex-col items-center sm:items-end ${i18n.dir() === 'rtl' ? 'sm:items-start sm:text-left' : ''}`}>
           <div className={`inline-flex items-center px-3 py-1 rounded-full border text-[8px] font-black tracking-widest uppercase mb-2 ${isDark ? 'bg-white/5 border-white/10 text-white/50' : 'bg-black/5 border-black/10 text-black/50'}`}>
             {t('liveDocs.issuer')}
           </div>
