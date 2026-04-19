@@ -1,5 +1,5 @@
 import React from "react";
-import { History, Calendar, Clock, BarChart3, AlertTriangle, Trash2 } from "lucide-react";
+import { History, Calendar, Clock, BarChart3, AlertTriangle, Trash2, Filter, Tag, X } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   AlertDialog,
@@ -12,8 +12,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHistory, status }) => {
+export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHistory, status, categories = [] }) => {
   const [showConfirm, setShowConfirm] = React.useState(false);
+  const [filterLabel, setFilterLabel] = React.useState('all');
 
   const currentMonth = new Date().toLocaleString("default", {
     month: "long",
@@ -27,24 +28,31 @@ export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHi
     return `${h}h ${m}m`;
   };
 
-  // Calculate total from current logs (completed segments)
+  // Calculate total from current logs (completed segments), aware of label filter
   const sessionTotal = React.useMemo(() => {
     let total = 0;
     let lastIn = null;
+    let lastInLabel = null;
+
     logs.forEach(log => {
       const time = new Date(log.timestamp).getTime();
       if (isNaN(time)) return;
       if (log.type === 'clockin') {
         lastIn = time;
+        lastInLabel = log.label;
       } else if (log.type === 'break' || log.type === 'clockout') {
         if (lastIn) {
-          total += (time - lastIn);
+          // If filtering, only add if the label matches
+          if (filterLabel === 'all' || lastInLabel === filterLabel) {
+            total += (time - lastIn);
+          }
           lastIn = null;
+          lastInLabel = null;
         }
       }
     });
     return total;
-  }, [logs]);
+  }, [logs, filterLabel]);
 
   // Handle ticking for active session
   const [activeExtra, setActiveExtra] = React.useState(0);
@@ -73,7 +81,26 @@ export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHi
     return () => clearInterval(timer);
   }, [logs, status]);
 
-  const displayTotal = (totalHours || 0) + sessionTotal + activeExtra;
+  const filteredLogs = React.useMemo(() => {
+    const baseLogs = filterLabel === 'all' ? logs : logs.filter(log => log.label === filterLabel);
+    return [...baseLogs].reverse();
+  }, [logs, filterLabel]);
+
+  const isClockedInMatch = React.useMemo(() => {
+    if (status !== 'clockin') return false;
+    if (filterLabel === 'all') return true;
+    
+    let currentLabel = null;
+    for (let i = logs.length - 1; i >= 0; i--) {
+      if (logs[i].type === 'clockin') {
+        currentLabel = logs[i].label;
+        break;
+      }
+    }
+    return currentLabel === filterLabel;
+  }, [status, logs, filterLabel]);
+
+  const displayTotal = (filterLabel === 'all' ? (totalHours || 0) : 0) + sessionTotal + (isClockedInMatch ? activeExtra : 0);
   const isClockedIn = status === 'clockin';
 
   const confirmClear = async () => {
@@ -120,11 +147,31 @@ export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHi
           <Trash2 size={12} />
           Delete Logs
         </button>
-        <div className="h-[1px] flex-grow bg-white/5" />
       </div>
 
-      {/* Stats Summary */}
-      <div className="mb-4">
+      <div className="h-[1px] w-full bg-white/5 mb-2" />
+
+      {/* Filter and Stats */}
+      <div className="flex flex-col gap-3 mb-4">
+        {/* Label Filter */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          <button
+            onClick={() => setFilterLabel('all')}
+            className={`whitespace-nowrap px-3 py-1.5 rounded-full text-[10px] font-bold transition-all duration-300 border ${filterLabel === 'all' ? 'bg-white/10 border-white/20 text-white' : 'bg-transparent border-white/5 text-white/40 hover:text-white/60'}`}
+          >
+            All Logs
+          </button>
+          {categories.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setFilterLabel(cat.name)}
+              className={`whitespace-nowrap px-3 py-1.5 rounded-full text-[10px] font-bold transition-all duration-300 border ${filterLabel === cat.name ? 'bg-cyan-500/20 border-cyan-400/30 text-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.1)]' : 'bg-transparent border-white/5 text-white/40 hover:text-white/60'}`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+
         <div className="p-4 bg-white/5 border border-white/5 rounded-2xl">
           <div className="flex items-center gap-2 text-white/40 mb-2">
             <Clock size={14} className="text-white/60" />
@@ -145,27 +192,34 @@ export const WorkHistory = ({ logs = [], totalHours = 0, history = {}, onClearHi
             {currentMonth}
           </div>
 
-          {logs.length === 0 ? (
+          {filteredLogs.length === 0 ? (
             <div className="text-center py-8 text-[11px] text-white/20 font-medium">
-              No logs recorded for this session
+              {filterLabel === 'all' ? "No logs recorded for this session" : `No logs found for "${filterLabel}"`}
             </div>
           ) : (
-            logs.map((log, i) => (
+            filteredLogs.map((log, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5 rounded-xl hover:bg-white/5 transition-all"
-                style={{ maxHeight: "56px", overflow: "hidden" }}
+                style={{ maxHeight: "64px", overflow: "hidden" }}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-1.5 h-1.5 rounded-full ${log.type === "clockin" ? "bg-green-500" : log.type === "break" ? "bg-yellow-500" : "bg-red-500"}`}
                   />
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-bold capitalize text-white/80">
-                      {log.type}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold capitalize text-white/80">
+                        {log.type}
+                      </span>
+                      {log.label && (
+                        <span className="px-1.5 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-400/20 text-cyan-400 text-[8px] font-black uppercase tracking-tighter">
+                          {log.label}
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[9px] text-white/30 font-mono">
                       {new Date(log.timestamp).toLocaleTimeString()}
                     </span>

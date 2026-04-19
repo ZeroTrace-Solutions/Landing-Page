@@ -5,7 +5,9 @@ import {
   updateWorkerStatus,
   syncWorkerField,
   addWorker,
-  clearWorkerLogs
+  clearWorkerLogs,
+  subscribeToWorkCategories,
+  addWorkCategory
 } from '../../../services/dataService';
 import { WorkerSidebar } from '@/components/admin/WorderWorkSpace/WorkerSidebar';
 import { WorkerHeader } from '@/components/admin/WorderWorkSpace/WorkerHeader';
@@ -37,6 +39,7 @@ export const WorkerWorkspace = ({ isFullScreen = false }) => {
   const [isAddWorkerOpen, setIsAddWorkerOpen] = useState(false);
   const [newWorkerName, setNewWorkerName] = useState('');
   const [newWorkerAvatar, setNewWorkerAvatar] = useState('');
+  const [categories, setCategories] = useState([]);
 
   // Sync URL changes to local state
   useEffect(() => {
@@ -60,6 +63,14 @@ export const WorkerWorkspace = ({ isFullScreen = false }) => {
     });
     return () => unsub();
   }, [selectedWorkerId, workerId, navigate]);
+
+  // Fetch categories real-time
+  useEffect(() => {
+    const unsub = subscribeToWorkCategories((data) => {
+      setCategories(data);
+    });
+    return () => unsub();
+  }, []);
 
   const handleSetSelectedWorkerId = (id) => {
     setSelectedWorkerId(id);
@@ -115,10 +126,10 @@ export const WorkerWorkspace = ({ isFullScreen = false }) => {
               activeWindows={activeWindows}
               toggleWindow={toggleWindow}
               onAvatarChange={(newAvatar) => syncWorkerField(selectedWorker.id, 'avatar', newAvatar)}
-              onClockIn={() => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString())}
+              onClockIn={(label) => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString(), label)}
               onClockOut={() => updateWorkerStatus(selectedWorker.id, 'clockout', new Date().toISOString())}
               onTakeBreak={() => updateWorkerStatus(selectedWorker.id, 'break', new Date().toISOString())}
-              onEndBreak={() => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString())}
+              onEndBreak={() => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString(), selectedWorker.workLabels?.[selectedWorker.workLabels.length - 1])}
             />
 
             <div className="flex-grow relative">
@@ -126,10 +137,12 @@ export const WorkerWorkspace = ({ isFullScreen = false }) => {
                 selectedWorker={selectedWorker}
                 activeWindows={activeWindows}
                 toggleWindow={toggleWindow}
-                onClockIn={() => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString())}
+                categories={categories}
+                onAddCategory={addWorkCategory}
+                onClockIn={(label) => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString(), label)}
                 onClockOut={() => updateWorkerStatus(selectedWorker.id, 'clockout', new Date().toISOString())}
                 onTakeBreak={() => updateWorkerStatus(selectedWorker.id, 'break', new Date().toISOString())}
-                onEndBreak={() => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString())}
+                onEndBreak={() => updateWorkerStatus(selectedWorker.id, 'clockin', new Date().toISOString(), selectedWorker.workLabels?.[selectedWorker.workLabels.length - 1])}
                 syncWorkerField={syncWorkerField}
                 onClearLogs={() => clearWorkerLogs(selectedWorker.id)}
               />

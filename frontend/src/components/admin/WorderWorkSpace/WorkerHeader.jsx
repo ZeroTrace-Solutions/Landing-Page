@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, BookOpen, CheckSquare, History, Play, Pause, Square, Coffee } from 'lucide-react';
+import { Clock, BookOpen, CheckSquare, History, Play, Pause, Square, Coffee, Tag } from 'lucide-react';
 import { ControlButton } from './ControlButton';
 import { calculateElapsedTime, formatTime } from './WorkTimer/calculationUtils';
 
-export const WorkerHeader = ({ 
-  selectedWorker, 
-  activeWindows, 
-  toggleWindow, 
+export const WorkerHeader = ({
+  selectedWorker,
+  activeWindows,
+  toggleWindow,
   onAvatarChange,
   onClockIn,
   onClockOut,
@@ -39,9 +39,14 @@ export const WorkerHeader = ({
   const isTimerOpen = activeWindows[selectedWorker.id]?.timer;
   const status = selectedWorker.status;
 
+  const activeLabel = React.useMemo(() => {
+    if (!selectedWorker.workLabels || status === 'clockout') return null;
+    return [...selectedWorker.workLabels].reverse().find(l => l && l.trim() !== '');
+  }, [selectedWorker.workLabels, status]);
+
   return (
     <div className="w-full bg-white/6 border border-white/15 rounded-3xl backdrop-blur-xl mb-4 lg:mb-8 p-4 sm:p-5 shadow-[0_0_1px_rgba(255,255,255,0.15),0_15px_30px_rgba(0,0,0,0.4)] relative z-10 transition-all duration-300">
-      <div 
+      <div
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
         <div className="flex flex-1 items-center gap-3 md:gap-4 w-full sm:w-auto">
@@ -54,17 +59,33 @@ export const WorkerHeader = ({
             <h2 className="text-base sm:text-lg font-black tracking-tight text-white truncate">{selectedWorker.name}</h2>
             <div className="flex items-center gap-2 mt-1">
               <span className={`w-2.5 h-2.5 rounded-full ${selectedWorker.status === 'clockin' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : selectedWorker.status === 'break' ? 'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`} />
-              <span className="text-[12px] font-bold text-white/90">
+              <span className="text-[12px] font-bold text-white/90 whitespace-nowrap">
                 {selectedWorker.status === 'clockin' ? 'Clocked In' : selectedWorker.status === 'break' ? 'On Break' : 'Clocked Out'}
               </span>
+              {activeLabel && (
+                <div className="flex hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 ml-1">
+                  <Tag size={10} className="text-cyan-400 flex-shrink-0" />
+                  <span className="text-[9px] font-black uppercase tracking-tight text-cyan-400/80 whitespace-nowrap">
+                    {activeLabel}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
           {!isTimerOpen && status !== 'clockout' && (
-            <div className="ml-auto sm:ml-4 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md">
+            <div className="ml-auto flex flex-col items-center gap-2 sm:ml-4 px-3 py-1.5 bg-white/5 rounded-xl border border-white/10 backdrop-blur-md">
               <span className="text-[14px] font-mono font-bold text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">
                 {formatTime(elapsedTime)}
               </span>
+               {activeLabel && (
+                <div className="flex md:hidden items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 ml-1 mt-1">
+                  <Tag size={10} className="text-cyan-400 flex-shrink-0" />
+                  <span className="text-[9px] font-black uppercase tracking-tight text-cyan-400/80 break-words max-w-[120px] leading-tight text-center">
+                    {activeLabel}
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -110,12 +131,12 @@ export const WorkerHeader = ({
             )}
           </div>
 
-          <button 
+          <button
             className="lg:hidden p-2 bg-white/5 rounded-full text-white/50 border border-white/10 hover:bg-white/10 transition-colors ml-2"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${isCollapsed ? '' : 'rotate-180'}`}>
-              <path d="m6 9 6 6 6-6"/>
+              <path d="m6 9 6 6 6-6" />
             </svg>
           </button>
         </div>

@@ -14,6 +14,8 @@ export const WorkerWindows = ({
   onEndBreak,
   syncWorkerField,
   onClearLogs,
+  categories = [],
+  onAddCategory,
 }) => {
   const [viewport, setViewport] = useState({ width: 1280, height: 720 });
 
@@ -94,12 +96,15 @@ export const WorkerWindows = ({
           workerId={selectedWorker.id}
           workStatus={selectedWorker.workStatus}
           workTimes={selectedWorker.workTimes}
+          workLabels={selectedWorker.workLabels}
           timerBgStyle={selectedWorker.timerBgStyle}
           onSync={(field, data) => syncWorkerField(selectedWorker.id, field, data)}
           onClockIn={onClockIn}
           onClockOut={onClockOut}
           onTakeBreak={onTakeBreak}
           onEndBreak={onEndBreak}
+          categories={categories}
+          onAddCategory={onAddCategory}
         />
       </DraggableWindow>
 
@@ -143,11 +148,13 @@ export const WorkerWindows = ({
           logs={(selectedWorker.workTimes || []).map((t, i) => ({
             timestamp: t,
             type: (selectedWorker.workStatus || [])[i] || 'unknown',
+            label: (selectedWorker.workLabels || [])[i] || '',
           }))}
           totalHours={selectedWorker.totalHours ?? 0}
           history={selectedWorker.history || []}
           onClearHistory={onClearLogs}
           status={selectedWorker.status}
+          categories={categories}
         />
       </DraggableWindow>
     </>

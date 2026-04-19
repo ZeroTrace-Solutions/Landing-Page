@@ -44,7 +44,7 @@ export const subscribeToWorker = (workerId, callback) => {
   });
 };
 
-export const updateWorkerStatus = async (workerId, status, timestamp) => {
+export const updateWorkerStatus = async (workerId, status, timestamp, label = null) => {
   const workerRef = doc(db, "workers", workerId);
   await runTransaction(db, async (tx) => {
     const workerSnap = await tx.get(workerRef);
@@ -53,11 +53,13 @@ export const updateWorkerStatus = async (workerId, status, timestamp) => {
     const current = workerSnap.data();
     const currentStatus = Array.isArray(current.workStatus) ? current.workStatus : [];
     const currentTimes = Array.isArray(current.workTimes) ? current.workTimes : [];
+    const currentLabels = Array.isArray(current.workLabels) ? current.workLabels : [];
 
     await tx.update(workerRef, {
       status,
       workStatus: [...currentStatus, status],
-      workTimes: [...currentTimes, timestamp]
+      workTimes: [...currentTimes, timestamp],
+      workLabels: [...currentLabels, label || '']
     });
   });
 };
@@ -74,6 +76,7 @@ export const clearWorkerLogs = async (workerId) => {
   await updateDoc(workerRef, {
     workStatus: [],
     workTimes: [],
+    workLabels: [],
     status: 'clockout',
   });
 };
@@ -116,4 +119,20 @@ export const calculateWorkerMonthlyStats = (workStatus, workTimes) => {
   }
 
   return totalWorkMs;
+};
+
+// Work Categories Management
+export const subscribeToWorkCategories = (callback) => {
+  return onSnapshot(collection(db, "workCategories"), (snapshot) => {
+    const categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(categories);
+  });
+};
+
+export const addWorkCategory = async (name) => {
+  const docRef = await addDoc(collection(db, "workCategories"), {
+    name,
+    createdAt: new Date().toISOString()
+  });
+  return docRef.id;
 };
