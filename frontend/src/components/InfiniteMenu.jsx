@@ -726,31 +726,151 @@ class InfiniteGridMenu {
     const gl = this.gl;
     this.tex = createAndSetupTexture(gl, gl.LINEAR, gl.LINEAR, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
 
-    const itemCount = Math.max(1, this.items.length);
+    const itemsToRender = (this.items && this.items.length > 0) ? this.items : defaultItems;
+    const itemCount = Math.max(1, itemsToRender.length);
     this.atlasSize = Math.ceil(Math.sqrt(itemCount));
     const cellSize = 512;
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = this.atlasSize * cellSize;
     canvas.height = this.atlasSize * cellSize;
 
-    Promise.all(this.items.map(item =>
-      new Promise(resolve => {
+    const drawFallbackCell = (i, item) => {
+      const x = (i % this.atlasSize) * cellSize;
+      const y = Math.floor(i / this.atlasSize) * cellSize;
+
+      const grad = ctx.createLinearGradient(x, y, x + cellSize, y + cellSize);
+      grad.addColorStop(0, '#060913');
+      grad.addColorStop(0.5, '#121824');
+      grad.addColorStop(1, '#0a0d18');
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, y, cellSize, cellSize);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x + 16, y + 16, cellSize - 32, cellSize - 32);
+
+      const cornerSize = 24;
+      ctx.strokeStyle = '#00ffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x + 16, y + 16 + cornerSize);
+      ctx.lineTo(x + 16, y + 16);
+      ctx.lineTo(x + 16 + cornerSize, y + 16);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(x + cellSize - 16 - cornerSize, y + cellSize - 16);
+      ctx.lineTo(x + cellSize - 16, y + cellSize - 16);
+      ctx.lineTo(x + cellSize - 16, y + cellSize - 16 - cornerSize);
+      ctx.stroke();
+
+      const centerX = x + cellSize / 2;
+      const centerY = y + cellSize / 2 - 30;
+
+      const radialGrad = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, 90);
+      radialGrad.addColorStop(0, 'rgba(0, 255, 255, 0.25)');
+      radialGrad.addColorStop(0.6, 'rgba(0, 255, 255, 0.05)');
+      radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = radialGrad;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 90, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 45, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.6)';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+      ctx.fillStyle = '#00ffff';
+      ctx.fill();
+
+      const titleText = item?.title || item?.titleAr || `PROJECT 0${i + 1}`;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 28px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const displayTitle = titleText.length > 22 ? titleText.substring(0, 20) + '...' : titleText;
+      ctx.fillText(displayTitle.toUpperCase(), centerX, centerY + 110);
+    };
+
+    const updateTexture = () => {
+      if (!this.gl || !this.tex) return;
+      gl.bindTexture(gl.TEXTURE_2D, this.tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+      gl.generateMipmap(gl.TEXTURE_2D);
+    };
+
+    itemsToRender.forEach((item, i) => {
+      drawFallbackCell(i, item);
+    });
+
+    updateTexture();
+
+    const drawImageToCell = (img, i) => {
+      const x = (i % this.atlasSize) * cellSize;
+      const y = Math.floor(i / this.atlasSize) * cellSize;
+
+      ctx.clearRect(x, y, cellSize, cellSize);
+
+      const imgAspect = img.width / img.height;
+      let drawWidth = cellSize;
+      let drawHeight = cellSize;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      if (imgAspect > 1) {
+        drawWidth = cellSize * imgAspect;
+        offsetX = -(drawWidth - cellSize) / 2;
+      } else {
+        drawHeight = cellSize / imgAspect;
+        offsetY = -(drawHeight - cellSize) / 2;
+      }
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, cellSize, cellSize);
+      ctx.clip();
+      ctx.drawImage(img, x + offsetX, y + offsetY, drawWidth, drawHeight);
+      ctx.restore();
+
+      updateTexture();
+    };
+
+    itemsToRender.forEach((item, i) => {
+      if (!item.image || typeof item.image !== 'string' || !item.image.trim()) {
+        return;
+      }
+
+      const rawUrl = item.image.trim();
+
+      const tryLoadImage = (url, isProxyAttempt = false) => {
         const img = new Image();
         img.crossOrigin = 'anonymous';
-        img.onload = () => resolve(img);
-        img.src = item.image;
-      }))).then(images => {
-        images.forEach((img, i) => {
-          const x = (i % this.atlasSize) * cellSize;
-          const y = Math.floor(i / this.atlasSize) * cellSize;
-          ctx.drawImage(img, x, y, cellSize, cellSize);
-        });
 
-        gl.bindTexture(gl.TEXTURE_2D, this.tex);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
-        gl.generateMipmap(gl.TEXTURE_2D);
-      });
+        img.onload = () => {
+          drawImageToCell(img, i);
+        };
+
+        img.onerror = () => {
+          if (!isProxyAttempt && !url.startsWith('data:') && !url.startsWith('blob:')) {
+            const proxiedUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}`;
+            tryLoadImage(proxiedUrl, true);
+          } else {
+            console.warn(`[InfiniteMenu] Failed to load image for item ${i} (${item.title || 'Untitled'}): ${url}`);
+          }
+        };
+
+        img.src = url;
+      };
+
+      tryLoadImage(rawUrl, false);
+    });
   }
 
   initDiscInstances(count) {

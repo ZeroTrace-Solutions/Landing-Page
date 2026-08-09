@@ -1,4 +1,5 @@
-import { db } from "../lib/firebase";
+import { db, auth } from "../lib/firebase";
+import { signInAnonymously } from "firebase/auth";
 import { 
   collection, 
   getDocs, 
@@ -13,6 +14,13 @@ import {
 
 // Portfolio Data
 export const getPortfolioData = async () => {
+  if (!auth.currentUser) {
+    try {
+      await signInAnonymously(auth);
+    } catch (err) {
+      console.warn("Anonymous sign-in for portfolio failed:", err);
+    }
+  }
   const querySnapshot = await getDocs(collection(db, "portfolio"));
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
