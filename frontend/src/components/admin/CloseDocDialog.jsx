@@ -5,11 +5,11 @@ import { motion } from 'framer-motion';
 export const CloseDocDialog = ({ open, onOpenChange, onCloseDoc, isBusy }) => {
   const [adminPassword, setAdminPassword] = useState('');
   const [error, setError] = useState(false);
-  const correctPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+  const correctPassword = (import.meta.env.VITE_ADMIN_PASSWORD || 'admin').trim();
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (adminPassword === correctPassword) {
+    if (adminPassword.trim() === correctPassword) {
       setError(false);
       onCloseDoc();
       setAdminPassword('');

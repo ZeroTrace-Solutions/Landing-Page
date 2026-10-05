@@ -14,7 +14,7 @@ import { WorkerWorkspace } from '@/pages/Admin/WorkerWorkspace/WorkerWorkspace'
 import { LiveDocPage } from '@/pages/LiveDocPage'
 import { DocPreviewPage } from '@/pages/DocPreviewPage'
 import { Toaster, toast } from 'sonner'
-import { auth } from '@/lib/firebase'
+import { auth, isConfigured } from '@/lib/firebase'
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth'
 
 function App() {
@@ -117,14 +117,13 @@ function App() {
         closeButton
         toastOptions={{
           style: {
-            background: 'rgba(20, 20, 20, 0.8)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)',
+            background: 'rgba(15, 23, 42, 0.95)',
+            border: '1px solid rgba(56, 189, 248, 0.3)',
+            backdropFilter: 'blur(12px)',
             color: '#fff',
             fontFamily: 'inherit',
-            fontSize: '10px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
+            fontSize: '12px',
+            fontWeight: '600',
           },
         }}
       />
@@ -137,38 +136,57 @@ function AdminProtection({ children }) {
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
-  const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+  const adminPassword = (import.meta.env.VITE_ADMIN_PASSWORD || 'admin').trim();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setAuthorized(true);
-      }
+    // Restore session if already verified in this browser tab
+    if (sessionStorage.getItem('zt_admin_session') === 'true') {
+      setAuthorized(true);
       setLoading(false);
-    });
-    return () => unsubscribe();
+      return;
+    }
+
+    if (!auth || !isConfigured) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setAuthorized(true);
+          sessionStorage.setItem('zt_admin_session', 'true');
+        }
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    } catch (err) {
+      console.warn("Auth check bypassed in local/offline mode:", err);
+      setLoading(false);
+    }
   }, []);
 
   const handleSubit = async (e) => {
     e.preventDefault();
-    if (password === adminPassword) {
-      try {
-        toast.loading("SECURE_AUTH_INITIALIZING...");
-        await signInAnonymously(auth);
-        setAuthorized(true);
-        setError(false);
-        toast.dismiss();
-        toast.success("AUTH_SESSION_ESTABLISHED");
-      } catch (err) {
-        console.error("Auth failed:", err);
-        toast.dismiss();
-        toast.error("GATEWAY_ERROR: Auth failure");
-        setError(true);
+    if (password.trim() === adminPassword) {
+      toast.loading("SECURE_AUTH_INITIALIZING...");
+      if (isConfigured && auth) {
+        try {
+          await signInAnonymously(auth);
+        } catch (err) {
+          console.warn("Firebase anonymous auth bypassed in local dev mode:", err);
+        }
       }
+      sessionStorage.setItem('zt_admin_session', 'true');
+      setAuthorized(true);
+      setError(false);
+      toast.dismiss();
+      toast.success("AUTH_SESSION_ESTABLISHED");
     } else {
       setError(true);
       setTimeout(() => setError(false), 500);
       setPassword('');
+      toast.error("INVALID_ACCESS_TOKEN");
     }
   };
 

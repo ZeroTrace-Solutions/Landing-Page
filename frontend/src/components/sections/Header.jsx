@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion as Motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import { ZTLogo } from '@/components/ui/ZTLogo'
 
 export const Header = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const lenis = useLenis()
   const navigate = useNavigate()
   const [activeSection, setActiveSection] = useState('')
@@ -23,7 +24,7 @@ export const Header = () => {
   }, [])
 
   useEffect(() => {
-    const sectionIds = ['framework', 'solutions', 'begin']
+    const sectionIds = ['guarantees', 'services', 'solutions', 'process', 'faq', 'begin']
 
     const observerOptions = {
       root: null,
@@ -62,10 +63,13 @@ export const Header = () => {
     setIsMenuOpen(false)
   }
 
+  const isAr = i18n.language === 'ar'
+
   const navLinks = [
-    { label: t('framework'), href: '#framework', id: 'framework' },
+    { label: t('framework'), href: '#guarantees', id: 'guarantees' },
+    { label: isAr ? 'الخدمات' : 'Services', href: '#services', id: 'services' },
     { label: t('solutions'), href: '#solutions', id: 'solutions' },
-    { label: t('manifesto'), href: '#manifesto', id: 'begin' },
+    { label: isAr ? 'رحلة العمل' : 'Process', href: '#process', id: 'process' },
   ]
 
   return (
@@ -74,12 +78,27 @@ export const Header = () => {
       : 'bg-transparent'
       }`}>
       <div className={`flex justify-between items-center transition-all duration-500 ${isScrolled ? 'py-4 px-8' : 'py-8 px-8'}`}>
-        <div className="flex items-center gap-4 relative z-[60]">
-          <div className="w-10 h-px bg-white/20" />
-          <span className="text-xs font-bold tracking-[0.4em] uppercase text-white/40 text-[15px]">
-            {t('alexandria2026')}
-          </span>
-        </div>
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            if (lenis) lenis.scrollTo(0, { duration: 1.2 });
+            else window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="flex items-center gap-3 relative z-[60] group cursor-pointer select-none"
+        >
+          <div className="w-8 h-8 flex items-center justify-center">
+            <ZTLogo size="sm" showText={false} animated={false} className="w-8 h-8" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-black tracking-[0.25em] text-white uppercase group-hover:text-sky-400 transition-colors font-mono">
+              ZT <span className="text-white/40 font-light">SOLUTIONS</span>
+            </span>
+            <span className="text-[8px] font-mono tracking-[0.3em] text-white/30 uppercase -mt-0.5">
+              DIGITAL ARCHITECTURE
+            </span>
+          </div>
+        </a>
 
         {/* Desktop Nav */}
         <nav className="hidden lg:flex gap-12 text-[15px] font-bold text-white/50 uppercase tracking-[0.5em]">

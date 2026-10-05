@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Github, Linkedin, Instagram, Facebook, Youtube } from 'lucide-react'
+import { Github, Linkedin, Instagram, Facebook, Youtube, Mail } from 'lucide-react'
 import { useLenis } from 'lenis/react'
 
 export const Footer = () => {
@@ -17,11 +17,19 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="pb-32 px-6 md:px-12 relative z-10">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-end gap-8 md:gap-12 pt-16 border-t border-white/5">
-        <div className="flex flex-col gap-6 text-center md:text-left items-center md:items-start">
-          <div className="text-xl font-black tracking-tighter">ZT Solutions</div>
-          <span className="text-white/20 text-[10px] font-bold uppercase tracking-widest">{t('footerCopyright')}</span>
+    <footer className="relative z-20 w-full bg-[#010206] pb-24 px-6 md:px-12">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-end gap-8 md:gap-12 pt-16 border-t border-white/10">
+        <div className="flex flex-col gap-3 text-center md:text-left items-center md:items-start">
+          <div className="text-xl font-black tracking-tight text-white font-mono">ZT SOLUTIONS</div>
+          <a
+            href="mailto:solutionzerotrace@gmail.com"
+            className="text-sky-400/80 hover:text-sky-300 font-mono text-xs transition-colors flex items-center gap-1.5"
+            title="solutionzerotrace@gmail.com"
+          >
+            <Mail className="w-3.5 h-3.5 text-sky-400" />
+            <span>solutionzerotrace@gmail.com</span>
+          </a>
+          <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">{t('footerCopyright')}</span>
         </div>
         <div className="flex flex-col gap-6 items-center md:items-end">
           <div className="flex flex-wrap justify-center md:justify-end gap-8 sm:gap-16 text-[10px] font-bold text-white/20 uppercase tracking-[0.4em]">
@@ -30,9 +38,14 @@ export const Footer = () => {
             <a href="https://github.com/ZeroTrace-Solutions" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">{t('source')}</a>
           </div>
           <div className="flex gap-6 text-white/40">
-            {/* <a href="#" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('linkedin')}>
-              <Linkedin className="w-4 h-4" />
-            </a> */}
+            <a
+              href="mailto:solutionzerotrace@gmail.com"
+              className="hover:text-white transition-colors p-1"
+              aria-label="Email"
+              title="solutionzerotrace@gmail.com"
+            >
+              <Mail className="w-4 h-4" />
+            </a>
             <a href="https://github.com/ZeroTrace-Solutions" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors p-1" aria-label={t('github')}>
               <Github className="w-4 h-4" />
             </a>

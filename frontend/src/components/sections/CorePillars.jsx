@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
-import { Search, Zap, Infinity as InfinityIcon, ArrowUpRight, Lock } from 'lucide-react'
+import { ShieldCheck, Eye, Award, Lock } from 'lucide-react'
 import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
 import TextPressure from '@/components/TextPressure'
 import TextType from '@/components/TextType'
@@ -66,10 +66,10 @@ export const CorePillars = () => {
   }, []);
 
   const pillars = [
-    { icon: <Search className="w-8 h-8" />, titleKey: 'strategicDiscovery', descKey: 'descDiscovery', color: 'bg-white/[0.03]' },
-    { icon: <InfinityIcon className="w-8 h-8" />, titleKey: 'totalLifecycle', descKey: 'descLifecycle', color: 'bg-blue-500/5' },
-    { icon: <Zap className="w-8 h-8" />, titleKey: 'agileResponse', descKey: 'descResponse', color: 'bg-purple-500/5' },
-    { icon: <Lock className="w-8 h-8" />, titleKey: 'zeroTraceSecurity', descKey: 'descZeroTrace', color: 'bg-blue-500/5' }
+    { icon: <ShieldCheck className="w-8 h-8 text-sky-400" />, titleKey: 'strategicDiscovery', descKey: 'descDiscovery', color: 'bg-sky-500/5' },
+    { icon: <Eye className="w-8 h-8 text-amber-400" />, titleKey: 'totalLifecycle', descKey: 'descLifecycle', color: 'bg-amber-500/5' },
+    { icon: <Award className="w-8 h-8 text-purple-400" />, titleKey: 'agileResponse', descKey: 'descResponse', color: 'bg-purple-500/5' },
+    { icon: <Lock className="w-8 h-8 text-emerald-400" />, titleKey: 'zeroTraceSecurity', descKey: 'descZeroTrace', color: 'bg-emerald-500/5' }
   ];
 
   return (

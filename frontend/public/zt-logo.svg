@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 650" width="100%" height="100%">
+  <defs>
+    <!-- Cyan / Blue Beacon Glow -->
+    <radialGradient id="beaconGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="1" />
+      <stop offset="30%" stop-color="#0284c7" stop-opacity="0.6" />
+      <stop offset="70%" stop-color="#0369a1" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#0369a1" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Star Node Glow -->
+    <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+      <stop offset="40%" stop-color="#bae6fd" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Soft Glow Filter -->
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="deepBloom" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="24" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g id="constellation-layer">
+    <!-- Constellation Lines (Z and T Ascent) -->
+    <!-- Top Bar of Z: Node 1 -> Node 2 -->
+    <line x1="318" y1="285" x2="416" y2="262" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2.5" />
+    
+    <!-- Diagonal of Z: Node 2 -> Node 3 -> Node 4 -->
+    <line x1="416" y1="262" x2="352" y2="390" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2.5" />
+    <line x1="352" y1="390" x2="322" y2="446" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2.5" />
+
+    <!-- Corner Triangle of Z: Node 4 -> Node 5 -> Node 6 -> Node 4 -->
+    <line x1="322" y1="446" x2="310" y2="502" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2.5" />
+    <line x1="310" y1="502" x2="344" y2="486" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2.5" />
+    <line x1="344" y1="486" x2="322" y2="446" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2.5" />
+
+    <!-- Bottom Bar of Z: Node 6 -> Node 7 -->
+    <line x1="344" y1="486" x2="430" y2="455" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2.5" />
+
+    <!-- T-Stem Ascent: Node 7 shooting straight up to the North Star -->
+    <line x1="430" y1="455" x2="462" y2="152" stroke="#ffffff" stroke-opacity="0.9" stroke-width="2.75" />
+
+    <!-- Subtle line glows -->
+    <g opacity="0.35" filter="url(#softGlow)">
+      <line x1="318" y1="285" x2="416" y2="262" stroke="#38bdf8" stroke-width="5" />
+      <line x1="416" y1="262" x2="322" y2="446" stroke="#38bdf8" stroke-width="5" />
+      <line x1="322" y1="446" x2="310" y2="502" stroke="#38bdf8" stroke-width="5" />
+      <line x1="310" y1="502" x2="344" y2="486" stroke="#38bdf8" stroke-width="5" />
+      <line x1="344" y1="486" x2="322" y2="446" stroke="#38bdf8" stroke-width="5" />
+      <line x1="344" y1="486" x2="430" y2="455" stroke="#38bdf8" stroke-width="5" />
+      <line x1="430" y1="455" x2="462" y2="152" stroke="#38bdf8" stroke-width="6" />
+    </g>
+
+    <!-- Star Nodes (White Stars with Halo) -->
+    <!-- Node 1 (Top Left) -->
+    <circle cx="318" cy="285" r="9" fill="url(#nodeGlow)" />
+    <circle cx="318" cy="285" r="5" fill="#ffffff" />
+
+    <!-- Node 2 (Top Right) -->
+    <circle cx="416" cy="262" r="9" fill="url(#nodeGlow)" />
+    <circle cx="416" cy="262" r="5" fill="#ffffff" />
+
+    <!-- Node 3 (Diagonal Mid) -->
+    <circle cx="352" cy="390" r="8" fill="url(#nodeGlow)" />
+    <circle cx="352" cy="390" r="4.5" fill="#ffffff" />
+
+    <!-- Node 4 (Lower Diagonal Corner) -->
+    <circle cx="322" cy="446" r="8" fill="url(#nodeGlow)" />
+    <circle cx="322" cy="446" r="4.5" fill="#ffffff" />
+
+    <!-- Node 5 (Triangle Bottom Left) -->
+    <circle cx="310" cy="502" r="9" fill="url(#nodeGlow)" />
+    <circle cx="310" cy="502" r="5" fill="#ffffff" />
+
+    <!-- Node 6 (Triangle Bottom Right) -->
+    <circle cx="344" cy="486" r="9" fill="url(#nodeGlow)" />
+    <circle cx="344" cy="486" r="5" fill="#ffffff" />
+
+    <!-- Node 7 (Bottom Right Anchor) -->
+    <circle cx="430" cy="455" r="9" fill="url(#nodeGlow)" />
+    <circle cx="430" cy="455" r="5.5" fill="#ffffff" />
+
+    <!-- RADIANT NORTH STAR (Beacon at top) -->
+    <!-- Ambient Radial Nebula Aura -->
+    <circle cx="462" cy="152" r="85" fill="url(#beaconGlow)" filter="url(#deepBloom)" />
+    <circle cx="462" cy="152" r="48" fill="url(#beaconGlow)" />
+
+    <!-- 4-Pointed Radiant Flare -->
+    <g filter="url(#softGlow)">
+      <!-- Vertical long spike -->
+      <polygon points="462,85 467,147 462,219 457,147" fill="#38bdf8" />
+      <polygon points="462,95 465,148 462,209 459,148" fill="#e0f2fe" />
+      
+      <!-- Horizontal cross spike -->
+      <polygon points="405,152 458,156 519,152 458,148" fill="#38bdf8" />
+      <polygon points="415,152 459,155 509,152 459,149" fill="#e0f2fe" />
+
+      <!-- Center Star Core Flare -->
+      <circle cx="462" cy="152" r="4.5" fill="#ffffff" />
+    </g>
+  </g>
+
+  <!-- Typography: ZT SOLUTIONS -->
+  <text 
+    x="400" 
+    y="595" 
+    text-anchor="middle" 
+    fill="#ffffff" 
+    font-family="system-ui, -apple-system, 'Inter', 'Outfit', sans-serif" 
+    font-size="34" 
+    font-weight="700" 
+    letter-spacing="0.28em"
+    style="text-transform: uppercase;">
+    ZT SOLUTIONS
+  </text>
+</svg>

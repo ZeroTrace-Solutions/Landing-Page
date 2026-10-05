@@ -14,15 +14,21 @@ import {
 
 // Portfolio Data
 export const getPortfolioData = async () => {
-  if (!auth.currentUser) {
-    try {
-      await signInAnonymously(auth);
-    } catch (err) {
-      console.warn("Anonymous sign-in for portfolio failed:", err);
+  try {
+    if (auth && !auth.currentUser) {
+      try {
+        await signInAnonymously(auth);
+      } catch (err) {
+        console.warn("Anonymous sign-in for portfolio failed:", err?.message || err);
+      }
     }
+    if (!db) return [];
+    const querySnapshot = await getDocs(collection(db, "portfolio"));
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.warn("[Portfolio] Firebase unavailable, using offline fallback:", error?.message || error);
+    return [];
   }
-  const querySnapshot = await getDocs(collection(db, "portfolio"));
-  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
 export const updatePortfolioItem = async (id, data) => {
